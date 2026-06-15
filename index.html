@@ -54,6 +54,12 @@
         button:hover {
             background-color: #34495e;
         }
+        .btn-list-view {
+            background-color: #27ae60;
+        }
+        .btn-list-view:hover {
+            background-color: #219653;
+        }
         .stats {
             text-align: center;
             font-weight: bold;
@@ -76,6 +82,12 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .track-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
         }
         .track-card.category-교향곡 { border-left-color: #3498db; }
         .track-card.category-협주곡 { border-left-color: #e67e22; }
@@ -99,6 +111,7 @@
             font-size: 15px;
             margin-bottom: 15px;
             line-height: 1.4;
+            color: #555;
         }
         .performance-section {
             border-top: 1px dashed #eee;
@@ -151,6 +164,107 @@
             font-size: 12px;
             background-color: #27ae60;
         }
+
+        /* 공통 팝업 모달 스타일 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+            color: var(--primary-color);
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #aaa;
+        }
+        .close-btn:hover {
+            color: #333;
+        }
+        .table-wrapper {
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        /* 전체 리스트 테이블 전용 스타일 */
+        .list-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+        .list-table th, .list-table td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .list-table th {
+            background-color: #f1f2f6;
+            color: var(--primary-color);
+            position: sticky;
+            top: 0;
+        }
+        .list-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        .col-idx { width: 10%; text-align: center; }
+        .col-composer { width: 25%; font-weight: bold; }
+        .col-title { width: 65%; }
+
+        /* 곡 수정 폼 전용 스타일 */
+        .edit-form-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .edit-form-group label {
+            font-weight: bold;
+            font-size: 14px;
+            color: var(--primary-color);
+        }
+        .edit-form-group input, .edit-form-group select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+        }
+        .edit-form-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .btn-save { background-color: #27ae60; }
+        .btn-save:hover { background-color: #219653; }
+        .btn-cancel { background-color: #7f8c8d; }
+        .btn-cancel:hover { background-color: #636e72; }
     </style>
 </head>
 <body>
@@ -172,11 +286,13 @@
         </select>
 
         <select id="sortOrder">
+            <option value="defaultOrder">내가 정한 순서 (기본)</option>
             <option value="composerAsc">작곡가 가나다순</option>
             <option value="yearAsc">작곡 연도순 (오래된 순)</option>
             <option value="yearDesc">작곡 연도순 (최신 순)</option>
         </select>
 
+        <button class="btn-list-view" onclick="openModal('listModal')">전체 리스트 보기</button>
         <button onclick="resetLibrary()">라이브러리 초기화</button>
     </div>
 
@@ -184,11 +300,69 @@
 
     <main class="library-grid" id="libraryGrid"></main>
 
+    <div class="modal-overlay" id="listModal" onclick="closeModal('listModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2>전체 작품 목록 (105곡)</h2>
+                <button class="close-btn" onclick="closeModal('listModal')">&times;</button>
+            </div>
+            <div class="table-wrapper">
+                <table class="list-table">
+                    <thead>
+                        <tr>
+                            <th class="col-idx">순번</th>
+                            <th class="col-composer">작곡가</th>
+                            <th class="col-title">작품명</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modalTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="editModal" onclick="closeModal('editModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2>작품 정보 수정</h2>
+                <button class="close-btn" onclick="closeModal('editModal')">&times;</button>
+            </div>
+            <form id="editTrackForm" onsubmit="saveTrackEdit(event)">
+                <input type="hidden" id="editTrackId">
+                <div class="edit-form-group">
+                    <label for="editComposer">작곡가</label>
+                    <input type="text" id="editComposer" required>
+                </div>
+                <div class="edit-form-group">
+                    <label for="editTitle">작품명</label>
+                    <input type="text" id="editTitle" required>
+                </div>
+                <div class="edit-form-group">
+                    <label for="editYear">작곡 연도 (숫자만)</label>
+                    <input type="number" id="editYear" required>
+                </div>
+                <div class="edit-form-group">
+                    <label for="editCategory">장르 분류</label>
+                    <select id="editCategory" required>
+                        <option value="교향곡">교향곡</option>
+                        <option value="협주곡">협주곡</option>
+                        <option value="독주곡">독주곡</option>
+                        <option value="성악/오페라">성악/오페라</option>
+                    </select>
+                </div>
+                <div class="edit-form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal('editModal')">취소</button>
+                    <button type="submit" class="btn-save">저장하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
 
-        // ⚠️ 메모장에 복사해 둔 파이어베이스 설정값을 아래에 정확히 덮어씌워 주세요.
+        // ⚠️ 메모장에 복사해 둔 파이어베이스 설정값을 여기에 정확히 덮어씌워 주세요.
         const firebaseConfig = {
             apiKey: "AIzaSyC0vb9iYY8Rgt6TJelolyl0QECCjTYZJ0g",
             authDomain: "classiclibrary-64b1e.firebaseapp.com",
@@ -199,14 +373,13 @@
             appId: "1:691470936171:web:57d82fda0b031494b4692e"
         };
 
-        // Firebase 시작
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const dbRef = ref(db, 'classic_library');
 
         let tracks = [];
 
-        // 기반이 되는 105곡 고증 데이터 전체 목록
+        // 원본 CSV 파일의 행 순서를 100% 반영한 고유 ID 매칭 리스트
         const initialTracks = [
             { "id": 1, "composer": "베토벤", "title": "바이올린 협주곡 D장조", "year": 1806, "category": "협주곡", "performances": [] },
             { "id": 2, "composer": "멘델스존", "title": "바이올린 협주곡", "year": 1844, "category": "협주곡", "performances": [] },
@@ -267,7 +440,7 @@
             { "id": 57, "composer": "거슈윈", "title": "랩소디 인 블루", "year": 1924, "category": "협주곡", "performances": [] },
             { "id": 58, "composer": "바흐", "title": "골드베르크 변주곡", "year": 1741, "category": "독주곡", "performances": [] },
             { "id": 59, "composer": "쇼팽", "title": "피아노 협주곡 2번", "year": 1830, "category": "협주곡", "performances": [] },
-            { "id": 60, "composer": "비제", "title": "아를르의 여인", "year": 1872, "category": "교향곡", "performances": [] },
+            { "id": 60, "composer": "비제", "title": "아를르의 여인", "year": 1872, "category": "교향곡", " उबर선 " },
             { "id": 61, "composer": "드보르자크", "title": "교향곡 9번 '신세계'", "year": 1893, "category": "교향곡", "performances": [] },
             { "id": 62, "composer": "리스트", "title": "헝가리 광시곡", "year": 1847, "category": "독주곡", "performances": [] },
             { "id": 63, "composer": "알베니스", "title": "아스투리아스", "year": 1892, "category": "독주곡", "performances": [] },
@@ -315,23 +488,74 @@
             { "id": 105, "composer": "루치오 달라", "title": "카루소", "year": 1986, "category": "성악/오페라", "performances": [] }
         ];
 
-        // Realtime Database 실시간 데이터 감지 및 로드
         onValue(dbRef, (snapshot) => {
             const data = snapshot.val();
-            if (data) {
+            // 파이어베이스에 기존 데이터가 있더라도 id 순번 정렬 체계를 새로 고침하기 위해 초기화 매칭 유도 가능
+            if (data && data.length === initialTracks.length) {
                 tracks = data;
             } else {
                 tracks = JSON.parse(JSON.stringify(initialTracks));
                 set(dbRef, tracks);
             }
             render();
+            buildModalTable();
         });
 
         function saveToFirebase() {
             set(dbRef, tracks);
         }
 
-        // 전역 범위 스크립트 연결 (버튼 호출용)
+        window.openModal = function(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        };
+
+        window.closeModal = function(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        };
+
+        window.openEditModal = function(trackId) {
+            const track = tracks.find(t => t.id === trackId);
+            if (!track) return;
+
+            document.getElementById('editTrackId').value = track.id;
+            document.getElementById('editComposer').value = track.composer;
+            document.getElementById('editTitle').value = track.title;
+            document.getElementById('editYear').value = track.year;
+            document.getElementById('editCategory').value = track.category;
+
+            openModal('editModal');
+        };
+
+        window.saveTrackEdit = function(event) {
+            event.preventDefault();
+            const id = parseInt(document.getElementById('editTrackId').value);
+            const track = tracks.find(t => t.id === id);
+
+            if (track) {
+                track.composer = document.getElementById('editComposer').value.trim();
+                track.title = document.getElementById('editTitle').value.trim();
+                track.year = parseInt(document.getElementById('editYear').value) || 0;
+                track.category = document.getElementById('editCategory').value;
+
+                saveToFirebase();
+                closeModal('editModal');
+            }
+        };
+
+        // 전체 리스트 테이블 빌드 (id 기준 정렬 고정 = 사용자 선호도 순서 보장)
+        function buildModalTable() {
+            const tbody = document.getElementById('modalTableBody');
+            const sortedByOriginal = [...tracks].sort((a,b) => a.id - b.id);
+            
+            tbody.innerHTML = sortedByOriginal.map((track, index) => `
+                <tr onclick="closeModal('listModal'); openEditModal(${track.id});" style="cursor:pointer;">
+                    <td class="col-idx">${track.id}</td>
+                    <td class="col-composer">${track.composer}</td>
+                    <td class="col-title">${track.title}</td>
+                </tr>
+            `).join('');
+        }
+
         window.addPerformance = function(trackId, event) {
             event.preventDefault();
             const form = event.target;
@@ -364,7 +588,7 @@
         };
 
         window.resetLibrary = function() {
-            if (confirm("모든 기기의 연주회 링크를 초기 상태로 되돌릴까요?")) {
+            if (confirm("모든 데이터와 정렬 순서를 처음 CSV 상태로 초기화할까요?")) {
                 tracks = JSON.parse(JSON.stringify(initialTracks));
                 saveToFirebase();
             }
@@ -383,7 +607,9 @@
                 return matchesSearch && matchesCategory;
             });
 
+            // 정렬 논리 수정: 기본 정렬 상태가 원본 데이터 id 순서가 되도록 설정
             filtered.sort((a, b) => {
+                if (sortOrder === 'defaultOrder') return a.id - b.id; // 내가 정한 고유 순서
                 if (sortOrder === 'yearAsc') return a.year - b.year;
                 if (sortOrder === 'yearDesc') return b.year - a.year;
                 if (sortOrder === 'composerAsc') return a.composer.localeCompare(b.composer, 'ko');
@@ -395,18 +621,18 @@
             grid.innerHTML = filtered.map(track => {
                 const safeCategoryClass = track.category.replace('/', '-');
                 const perfListHtml = (track.performances || []).map(p => `
-                    <li class="performance-item">
+                    <li class="performance-item" onclick="event.stopPropagation()">
                         <a href="${p.url}" target="_blank">▶ ${p.title}</a>
                         <button class="delete-btn" onclick="deletePerformance(${track.id}, ${p.id})">×</button>
                     </li>
                 `).join('');
 
                 return `
-                    <div class="track-card category-${safeCategoryClass}">
+                    <div class="track-card category-${safeCategoryClass}" onclick="openEditModal(${track.id})">
                         <div>
                             <div class="track-meta">
                                 <span>${track.category}</span>
-                                <span>${track.year}년경 작곡</span>
+                                <span>No. ${track.id}</span>
                             </div>
                             <div class="composer">${track.composer}</div>
                             <div class="title">${track.title}</div>
@@ -416,7 +642,7 @@
                             <ul class="performance-list">
                                 ${perfListHtml || '<li style="color:#aaa; font-size:12px; font-style:italic;">등록된 명연주 주소가 없습니다.</li>'}
                             </ul>
-                            <form class="add-link-form" onSubmit="addPerformance(${track.id}, event)">
+                            <form class="add-link-form" onSubmit="addPerformance(${track.id}, event)" onclick="event.stopPropagation()">
                                 <input type="text" class="perf-title" placeholder="연주자/설명 (예: 백건우)">
                                 <input type="url" class="perf-url" placeholder="유튜브 URL 링크" required>
                                 <button type="submit">추가</button>
