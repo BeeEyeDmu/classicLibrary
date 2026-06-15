@@ -3,429 +3,433 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>클래식 라이브러리 (Classic Library)</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>나만의 클래식 음악 라이브러리</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&family=Pretendard:wght@400;600;700&display=swap');
-        body {
-            font-family: 'Pretendard', sans-serif;
-            background-color: #f8fafc;
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
         }
-        .serif-title {
-            font-family: 'Noto Serif KR', serif;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        select, input, button {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #34495e;
+        }
+        .stats {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        .library-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .track-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--primary-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .track-card.category-교향곡 { border-left-color: #3498db; }
+        .track-card.category-협주곡 { border-left-color: #e67e22; }
+        .track-card.category-독주곡 { border-left-color: #9b59b6; }
+        .track-card.category-성악-오페라 { border-left-color: #1abc9c; }
+
+        .track-meta {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .composer {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 5px 0;
+        }
+        .title {
+            font-size: 15px;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        .performance-section {
+            border-top: 1px dashed #eee;
+            padding-top: 10px;
+            margin-top: auto;
+        }
+        .performance-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 10px 0;
+            font-size: 13px;
+        }
+        .performance-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+            background: #f1f2f6;
+            padding: 5px 8px;
+            border-radius: 4px;
+        }
+        .performance-item a {
+            color: #2980b9;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .performance-item a:hover {
+            text-decoration: underline;
+        }
+        .delete-btn {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            cursor: pointer;
+            padding: 0 5px;
+            font-size: 12px;
+        }
+        .add-link-form {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        .add-link-form input {
+            padding: 5px;
+            font-size: 12px;
+            flex: 1;
+        }
+        .add-link-form button {
+            padding: 5px 10px;
+            font-size: 12px;
+            background-color: #27ae60;
         }
     </style>
 </head>
-<body class="text-slate-800 antialiased pb-28 text-base">
+<body>
 
-    <!-- Header -->
-    <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-md">
-        <div class="max-w-md mx-auto px-5 py-5 flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-bold serif-title tracking-wide text-amber-400">Classic Library</h1>
-                <p class="text-sm text-slate-400 font-light mt-1">나만의 명곡 아카이브</p>
-            </div>
-            <button onclick="openAddModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-base px-4 py-2 rounded-full shadow transition flex items-center gap-1.5">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
-                추가
-            </button>
-        </div>
+    <header>
+        <h1>My Classical Music Library</h1>
+        <p>나만의 실시간 명연주 기록 보관소</p>
     </header>
 
-    <!-- Main Container -->
-    <main class="max-w-md mx-auto px-5 py-6">
+    <div class="controls">
+        <input type="text" id="searchInput" placeholder="작곡가 또는 작품명 검색...">
         
-        <!-- Search & Filter Bar -->
-        <div class="mb-6 bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
-            <div class="relative mb-4">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                </span>
-                <input type="text" id="searchInput" oninput="filterTracks()" class="w-full bg-slate-50 text-slate-900 placeholder-slate-400 text-base rounded-xl pl-11 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-amber-400 border border-transparent transition" placeholder="작곡가, 곡명으로 검색...">
-            </div>
-            
-            <!-- Category Chips -->
-            <div class="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none text-sm">
-                <button onclick="filterCategory('all')" id="chip-all" class="category-chip px-4 py-2 rounded-full bg-slate-900 text-white font-medium whitespace-nowrap transition">전체</button>
-                <button onclick="filterCategory('교향곡')" id="chip-교향곡" class="category-chip px-4 py-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">교향곡</button>
-                <button onclick="filterCategory('협주곡')" id="chip-협주곡" class="category-chip px-4 py-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">협주곡</button>
-                <button onclick="filterCategory('독주곡')" id="chip-독주곡" class="category-chip px-4 py-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">독주/실내악</button>
-                <button onclick="filterCategory('성악/오페라')" id="chip-성악/오페라" class="category-chip px-4 py-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">성악/오페라</button>
-            </div>
-        </div>
+        <select id="categoryFilter">
+            <option value="all">모든 장르</option>
+            <option value="교향곡">교향곡</option>
+            <option value="협주곡">협주곡</option>
+            <option value="독주곡">독주곡/실내악</option>
+            <option value="성악/오페라">성악/오페라</option>
+        </select>
 
-        <!-- Library Stats -->
-        <div class="flex justify-between items-center mb-5 px-1 text-sm text-slate-500">
-            <div>보관된 명곡 <span id="trackCount" class="font-bold text-slate-800 text-base">0</span>개</div>
-            <div class="flex items-center gap-1 text-amber-600 font-medium">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                나만의 엄선 큐레이션
-            </div>
-        </div>
+        <select id="sortOrder">
+            <option value="composerAsc">작곡가 가나다순</option>
+            <option value="yearAsc">작곡 연도순 (오래된 순)</option>
+            <option value="yearDesc">작곡 연도순 (최신 순)</option>
+        </select>
 
-        <!-- Dynamic List Container -->
-        <div id="libraryContainer" class="space-y-5"></div>
-
-    </main>
-
-    <!-- Sticky Video Player Panel -->
-    <div id="globalPlayer" class="fixed bottom-0 inset-x-0 bg-slate-900 text-white shadow-2xl border-t border-slate-800 transform translate-y-full transition-transform duration-300 z-50 rounded-t-2xl">
-        <div class="max-w-md mx-auto p-5">
-            <div class="flex justify-between items-start mb-4">
-                <div class="pr-4">
-                    <span id="playerComposer" class="text-xs font-bold uppercase tracking-wider text-amber-400 block">작곡가</span>
-                    <h3 id="playerTitle" class="text-base font-bold line-clamp-1 text-slate-100 mt-0.5">재생 중인 곡 제목</h3>
-                    <p id="playerPerformer" class="text-sm text-slate-400 mt-1 line-clamp-1">연주자 정보</p>
-                </div>
-                <button onclick="closePlayer()" class="text-slate-400 hover:text-white p-1.5 rounded-full hover:bg-slate-800 transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l1.414 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
-                </button>
-            </div>
-            <div class="relative aspect-video rounded-xl overflow-hidden bg-black shadow-inner">
-                <iframe id="youtubeIframe" class="absolute inset-0 w-full h-full" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-            </div>
-        </div>
+        <button onclick="resetLibrary()">라이브러리 초기화</button>
     </div>
 
-    <!-- Track Management Modal (Dynamic Multi-Performance Form) -->
-    <div id="trackModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50 overflow-y-auto">
-        <div class="bg-white rounded-2xl w-full max-w-sm my-auto overflow-hidden shadow-2xl border border-slate-100 flex flex-col max-h-[90vh]">
-            <!-- Modal Header -->
-            <div class="bg-slate-900 text-white px-5 py-4 flex justify-between items-center shrink-0">
-                <h3 id="modalTitleText" class="font-bold serif-title text-amber-400 text-lg">새로운 클래식 추가</h3>
-                <button onclick="closeTrackModal()" class="text-slate-400 hover:text-white transition">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l1.414 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
-                </button>
-            </div>
-            
-            <!-- Modal Form Frame -->
-            <form id="trackForm" onsubmit="saveTrackForm(event)" class="p-5 space-y-4 text-base overflow-y-auto flex-1">
-                <input type="hidden" id="formTrackId">
-                <div>
-                    <label class="block text-sm font-bold text-slate-600 mb-1">작곡가 <span class="text-rose-500">*</span></label>
-                    <input type="text" id="formComposer" required class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-slate-50 text-base" placeholder="예: 바흐, 베토벤, 쇼팽">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-600 mb-1">곡명 <span class="text-rose-500">*</span></label>
-                    <input type="text" id="formTitle" required class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-slate-50 text-base" placeholder="예: 무반주 첼로 모음곡 1번">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-sm font-bold text-slate-600 mb-1">작곡년도</label>
-                        <input type="number" id="formYear" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-slate-50 text-base" placeholder="예: 1720">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-slate-600 mb-1">카테고리</label>
-                        <select id="formCategory" class="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-slate-50 text-base">
-                            <option value="독주곡">독주곡/실내악</option>
-                            <option value="교향곡">교향곡</option>
-                            <option value="협주곡">협주곡</option>
-                            <option value="성악/오페라">성악/오페라</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <!-- Dynamic Performances Section -->
-                <div class="border-t border-dashed border-slate-200 my-2 pt-3">
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="block text-sm font-bold text-slate-700">명연주 리스트 등록</label>
-                        <button type="button" onclick="addPerformanceRow('', '')" class="text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-2.5 py-1 rounded-md flex items-center gap-1 transition">
-                            + 연주 추가
-                        </button>
-                    </div>
-                    
-                    <!-- Container for rows -->
-                    <div id="performanceInputsContainer" class="space-y-3"></div>
-                </div>
+    <div class="stats" id="libraryStats">로딩 중...</div>
 
-                <!-- Footer Buttons -->
-                <div class="flex gap-3 pt-3 sticky bottom-0 bg-white border-t border-slate-100 mt-4">
-                    <button type="button" onclick="closeTrackModal()" class="w-1/3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-xl transition text-base">취소</button>
-                    <button type="submit" class="w-2/3 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition shadow-md text-base">저장하기</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <main class="library-grid" id="libraryGrid"></main>
 
-    <!-- Web Logic Framework -->
-    <script>
-        const initialTracks = [
-            {
-                id: 1,
-                composer: "Ludwig van Beethoven",
-                title: "Piano Sonata No. 14 in C-sharp minor, Op. 27, No. 2 'Moonlight' (월광)",
-                year: 1801,
-                category: "독주곡",
-                performances: [
-                    { performer: "백건우 (Kun-Woo Paik)", youtubeUrl: "https://www.youtube.com/watch?v=S8L69v7Z_3E" },
-                    { performer: "조성진 (Seong-Jin Cho)", youtubeUrl: "https://www.youtube.com/watch?v=A78F6T_1hM0" }
-                ]
-            },
-            {
-                id: 2,
-                composer: "Frédéric Chopin",
-                title: "Ballade No. 1 in G minor, Op. 23",
-                year: 1835,
-                category: "독주곡",
-                performances: [{ performer: "조성진 (Seong-Jin Cho) - 쇼팽 콩쿠르", youtubeUrl: "https://www.youtube.com/watch?v=614OSs9BSeQ" }]
-            }
-        ];
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+
+        // ⚠️ 메모장에 복사해 둔 파이어베이스 설정값을 아래에 정확히 덮어씌워 주세요.
+        const firebaseConfig = {
+            apiKey: "AIzaSyC0vb9iYY8Rgt6TJelolyl0QECCjTYZJ0g",
+            authDomain: "classiclibrary-64b1e.firebaseapp.com",
+            databaseURL: "https://classiclibrary-64b1e-default-rtdb.firebaseio.com", // 이 줄이 잘 매칭되어 있는지 꼭 확인하세요!
+            projectId: "classiclibrary-64b1e",
+            storageBucket: "classiclibrary-64b1e.firebasestorage.app",
+            messagingSenderId: "691470936171",
+            appId: "1:691470936171:web:57d82fda0b031494b4692e"
+        };
+
+        // Firebase 시작
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const dbRef = ref(db, 'classic_library');
 
         let tracks = [];
-        let currentFilter = 'all';
 
-        function initApp() {
-            const stored = localStorage.getItem('classic_library_tracks');
-            if (stored) {
-                tracks = JSON.parse(stored);
+        // 기반이 되는 105곡 고증 데이터 전체 목록
+        const initialTracks = [
+            { "id": 1, "composer": "베토벤", "title": "바이올린 협주곡 D장조", "year": 1806, "category": "협주곡", "performances": [] },
+            { "id": 2, "composer": "멘델스존", "title": "바이올린 협주곡", "year": 1844, "category": "협주곡", "performances": [] },
+            { "id": 3, "composer": "베토벤", "title": "피아노 협주곡 5번 '황제'", "year": 1811, "category": "협주곡", "performances": [] },
+            { "id": 4, "composer": "슈베르트", "title": "교향곡 8번 '미완성'", "year": 1822, "category": "교향곡", "performances": [] },
+            { "id": 5, "composer": "비에니아프스키", "title": "전설", "year": 1860, "category": "독주곡", "performances": [] },
+            { "id": 6, "composer": "파가니니", "title": "카프리스 24번", "year": 1819, "category": "독주곡", "performances": [] },
+            { "id": 7, "composer": "쇼팽", "title": "피아노 협주곡 1번", "year": 1830, "category": "협주곡", "performances": [] },
+            { "id": 8, "composer": "모차르트", "title": "Out of Africa 관련 곡", "year": 1785, "category": "협주곡", "performances": [] },
+            { "id": 9, "composer": "바흐", "title": "무반주 첼로 조곡", "year": 1720, "category": "독주곡", "performances": [] },
+            { "id": 10, "composer": "바흐", "title": "무반주 바이올린 파르티타 2번 샤콘느 BWV1004", "year": 1720, "category": "독주곡", "performances": [] },
+            { "id": 11, "composer": "비탈리", "title": "샤콘느", "year": 1705, "category": "독주곡", "performances": [] },
+            { "id": 12, "composer": "브루흐", "title": "바이올린 협주곡 1번", "year": 1866, "category": "협주곡", "performances": [] },
+            { "id": 13, "composer": "생상스", "title": "서주와 론도 카프리치오소", "year": 1863, "category": "독주곡", "performances": [] },
+            { "id": 14, "composer": "비발디", "title": "사계", "year": 1725, "category": "협주곡", "performances": [] },
+            { "id": 15, "composer": "라흐마니노프", "title": "보칼리제", "year": 1915, "category": "성악/오페라", "performances": [] },
+            { "id": 16, "composer": "파가니니", "title": "바이올린 협주곡 2번 '라 캄파넬라'", "year": 1826, "category": "협주곡", "performances": [] },
+            { "id": 17, "composer": "슈베르트", "title": "아르페지오네 소나타", "year": 1824, "category": "독주곡", "performances": [] },
+            { "id": 18, "composer": "빌라로보스", "title": "브라질풍의 바흐", "year": 1930, "category": "독주곡", "performances": [] },
+            { "id": 19, "composer": "하이든", "title": "첼로 협주곡 1번", "year": 1765, "category": "협주곡", "performances": [] },
+            { "id": 20, "composer": "헨델", "title": "파사칼리아", "year": 1693, "category": "독주곡", "performances": [] },
+            { "id": 21, "composer": "베르디", "title": "나부코 - 히브리 노예들의 합창", "year": 1841, "category": "성악/오페라", "performances": [] },
+            { "id": 22, "composer": "로드리고", "title": "아랑훼즈 협주곡", "year": 1939, "category": "협주곡", "performances": [] },
+            { "id": 23, "composer": "로드리고", "title": "안달루시아 협주곡", "year": 1954, "category": "협주곡", "performances": [] },
+            { "id": 24, "composer": "헨델", "title": "사라방드", "year": 1733, "category": "독주곡", "performances": [] },
+            { "id": 25, "composer": "모차르트", "title": "오보에 협주곡 K.314", "year": 1777, "category": "협주곡", "performances": [] },
+            { "id": 26, "composer": "바흐", "title": "토카타와 푸가 D단조 BWV565", "year": 1708, "category": "독주곡", "performances": [] },
+            { "id": 27, "composer": "모차르트", "title": "피아노 협주곡 23번", "year": 1786, "category": "협주곡", "performances": [] },
+            { "id": 28, "composer": "생상스", "title": "죽음의 무도", "year": 1874, "category": "교향곡", "performances": [] },
+            { "id": 29, "composer": "차이콥스키", "title": "바이올린 협주곡 Op.35", "year": 1878, "category": "협주곡", "performances": [] },
+            { "id": 30, "composer": "차이콥스키", "title": "교향곡 6번 '비창'", "year": 1893, "category": "교향곡", "performances": [] },
+            { "id": 31, "composer": "파헬벨", "title": "캐논", "year": 1680, "category": "독주곡", "performances": [] },
+            { "id": 32, "composer": "슈베르트", "title": "마왕", "year": 1815, "category": "성악/오페라", "performances": [] },
+            { "id": 33, "composer": "베토벤", "title": "교향곡 3번 '영웅'", "year": 1804, "category": "교향곡", "performances": [] },
+            { "id": 34, "composer": "베토벤", "title": "교향곡 5번 '운명'", "year": 1808, "category": "교향곡", "performances": [] },
+            { "id": 35, "composer": "베토벤", "title": "교향곡 6번 '전원'", "year": 1808, "category": "교향곡", "performances": [] },
+            { "id": 36, "composer": "베토벤", "title": "교향곡 9번 '합창'", "year": 1824, "category": "교향곡", "performances": [] },
+            { "id": 37, "composer": "하이든", "title": "첼로 협주곡 2번", "year": 1783, "category": "협주곡", "performances": [] },
+            { "id": 38, "composer": "베토벤", "title": "월광 소나타", "year": 1801, "category": "독주곡", "performances": [] },
+            { "id": 39, "composer": "모차르트", "title": "피아노 협주곡 20번", "year": 1785, "category": "협주곡", "performances": [] },
+            { "id": 40, "composer": "모차르트", "title": "피아노 협주곡 21번", "year": 1785, "category": "협주곡", "performances": [] },
+            { "id": 41, "composer": "리스트", "title": "탄식", "year": 1851, "category": "독주곡", "performances": [] },
+            { "id": 42, "composer": "슈베르트", "title": "현악4중주 '죽음과 소녀'", "year": 1824, "category": "독주곡", "performances": [] },
+            { "id": 43, "composer": "하이든", "title": "트럼펫 협주곡", "year": 1796, "category": "협주곡", "performances": [] },
+            { "id": 44, "composer": "라벨", "title": "볼레로", "year": 1928, "category": "교향곡", "performances": [] },
+            { "id": 45, "composer": "헨델", "title": "Ombra Mai Fu", "year": 1738, "category": "성악/오페라", "performances": [] },
+            { "id": 46, "composer": "쇼스타코비치", "title": "왈츠 2번", "year": 1956, "category": "교향곡", "performances": [] },
+            { "id": 47, "composer": "하이든", "title": "현악4중주 '종달새'", "year": 1790, "category": "독주곡", "performances": [] },
+            { "id": 48, "composer": "줄리아니", "title": "기타 협주곡", "year": 1808, "category": "협주곡", "performances": [] },
+            { "id": 49, "composer": "생상스", "title": "바이올린 협주곡 3번", "year": 1879, "category": "협주곡", "performances": [] },
+            { "id": 50, "composer": "피아졸라", "title": "대표 작품", "year": 1960, "category": "독주곡", "performances": [] },
+            { "id": 51, "composer": "쇼팽", "title": "발라드 1번", "year": 1835, "category": "독주곡", "performances": [] },
+            { "id": 52, "composer": "볼컴", "title": "우아한 유령 래그", "year": 1970, "category": "독주곡", "performances": [] },
+            { "id": 53, "composer": "라벨", "title": "물의 유희", "year": 1901, "category": "독주곡", "performances": [] },
+            { "id": 54, "composer": "브루흐", "title": "스코틀랜드 환상곡", "year": 1880, "category": "협주곡", "performances": [] },
+            { "id": 55, "composer": "슈베르트", "title": "피아노 3중주 D.929 2악장", "year": 1827, "category": "독주곡", "performances": [] },
+            { "id": 56, "composer": "모차르트", "title": "호른 협주곡 3번", "year": 1787, "category": "협주곡", "performances": [] },
+            { "id": 57, "composer": "거슈윈", "title": "랩소디 인 블루", "year": 1924, "category": "협주곡", "performances": [] },
+            { "id": 58, "composer": "바흐", "title": "골드베르크 변주곡", "year": 1741, "category": "독주곡", "performances": [] },
+            { "id": 59, "composer": "쇼팽", "title": "피아노 협주곡 2번", "year": 1830, "category": "협주곡", "performances": [] },
+            { "id": 60, "composer": "비제", "title": "아를르의 여인", "year": 1872, "category": "교향곡", "performances": [] },
+            { "id": 61, "composer": "드보르자크", "title": "교향곡 9번 '신세계'", "year": 1893, "category": "교향곡", "performances": [] },
+            { "id": 62, "composer": "리스트", "title": "헝가리 광시곡", "year": 1847, "category": "독주곡", "performances": [] },
+            { "id": 63, "composer": "알베니스", "title": "아스투리아스", "year": 1892, "category": "독주곡", "performances": [] },
+            { "id": 64, "composer": "모차르트", "title": "환상곡 K.397", "year": 1782, "category": "독주곡", "performances": [] },
+            { "id": 65, "composer": "바흐", "title": "시칠리아노 BWV1031", "year": 1730, "category": "독주곡", "performances": [] },
+            { "id": 66, "composer": "모차르트", "title": "피아노 소나타 12번 K.332", "year": 1783, "category": "독주곡", "performances": [] },
+            { "id": 67, "composer": "라벨", "title": "죽은 왕녀를 위한 파반느", "year": 1899, "category": "독주곡", "performances": [] },
+            { "id": 68, "composer": "포레", "title": "파반느 Op.50", "year": 1887, "category": "교향곡", "performances": [] },
+            { "id": 69, "composer": "멘델스존", "title": "핑갈의 동굴", "year": 1830, "category": "교향곡", "performances": [] },
+            { "id": 70, "composer": "드뷔시", "title": "목신의 오후 전주곡", "year": 1894, "category": "교향곡", "performances": [] },
+            { "id": 71, "composer": "드보르자크", "title": "슬라브 무곡", "year": 1878, "category": "교향곡", "performances": [] },
+            { "id": 72, "composer": "바그너", "title": "탄호이저 서곡", "year": 1845, "category": "성악/오페라", "performances": [] },
+            { "id": 73, "composer": "브람스", "title": "대학축전 서곡", "year": 1880, "category": "교향곡", "performances": [] },
+            { "id": 74, "composer": "모차르트", "title": "피가로의 결혼", "year": 1786, "category": "성악/오페라", "performances": [] },
+            { "id": 75, "composer": "베르디", "title": "오페라 작품들", "year": 1850, "category": "성악/오페라", "performances": [] },
+            { "id": 76, "composer": "번스타인", "title": "웨스트 사이드 스토리", "year": 1957, "category": "성악/오페라", "performances": [] },
+            { "id": 77, "composer": "프랑크", "title": "바이올린 소나타 A장조", "year": 1886, "category": "독주곡", "performances": [] },
+            { "id": 78, "composer": "그리그", "title": "페르귄트 모음곡", "year": 1875, "category": "교향곡", "performances": [] },
+            { "id": 79, "composer": "거슈윈", "title": "포기와 베스 - Summertime", "year": 1935, "category": "성악/오페라", "performances": [] },
+            { "id": 80, "composer": "베토벤", "title": "발트슈타인 소나타", "year": 1804, "category": "독주곡", "performances": [] },
+            { "id": 81, "composer": "비발디", "title": "세상에 참 평화없어라", "year": 1725, "category": "성악/오페라", "performances": [] },
+            { "id": 82, "composer": "칼 젠킨스", "title": "팔라디오", "year": 1995, "category": "교향곡", "performances": [] },
+            { "id": 83, "composer": "바흐", "title": "바이올린 협주곡 1번", "year": 1730, "category": "협주곡", "performances": [] },
+            { "id": 84, "composer": "바흐", "title": "바이올린과 오보에를 위한 협주곡", "year": 1730, "category": "협주곡", "performances": [] },
+            { "id": 85, "composer": "라흐마니노프", "title": "피아노 협주곡 2번", "year": 1901, "category": "협주곡", "performances": [] },
+            { "id": 86, "composer": "라흐마니노프", "title": "피아노 협주곡 3번", "year": 1909, "category": "협주곡", "performances": [] },
+            { "id": 87, "composer": "라흐마니노프", "title": "교향곡 2번", "year": 1907, "category": "교향곡", "performances": [] },
+            { "id": 88, "composer": "마르첼로", "title": "오보에 협주곡 D단조", "year": 1717, "category": "협주곡", "performances": [] },
+            { "id": 89, "composer": "벨리니", "title": "노르마", "year": 1831, "category": "성악/오페라", "performances": [] },
+            { "id": 90, "composer": "비발디", "title": "두 대의 트럼펫을 위한 협주곡", "year": 1720, "category": "협주곡", "performances": [] },
+            { "id": 91, "composer": "파가니니", "title": "바이올린과 기타를 위한 소나타", "year": 1803, "category": "독주곡", "performances": [] },
+            { "id": 92, "composer": "헨델", "title": "울게 하소서", "year": 1711, "category": "성악/오페라", "performances": [] },
+            { "id": 93, "composer": "베토벤", "title": "비창 소나타", "year": 1798, "category": "독주곡", "performances": [] },
+            { "id": 94, "composer": "로시니", "title": "윌리엄 텔 서곡", "year": 1829, "category": "성악/오페라", "performances": [] },
+            { "id": 95, "composer": "로드리고", "title": "어느 귀인을 위한 환상곡", "year": 1954, "category": "협주곡", "performances": [] },
+            { "id": 96, "composer": "베토벤", "title": "교향곡 7번", "year": 1812, "category": "교향곡", "performances": [] },
+            { "id": 97, "composer": "바버", "title": "현을 위한 아다지오 Op.11", "year": 1936, "category": "교향곡", "performances": [] },
+            { "id": 98, "composer": "피아졸라", "title": "오블리비온", "year": 1982, "category": "독주곡", "performances": [] },
+            { "id": 99, "composer": "피아졸라", "title": "리베르탱고", "year": 1974, "category": "독주곡", "performances": [] },
+            { "id": 100, "composer": "모차르트", "title": "피가로의 결혼 중 편지의 이중창", "year": 1786, "category": "성악/오페라", "performances": [] },
+            { "id": 101, "composer": "모차르트", "title": "돈 조반니", "year": 1787, "category": "성악/오페라", "performances": [] },
+            { "id": 102, "composer": "모차르트", "title": "마술피리", "year": 1791, "category": "성악/오페라", "performances": [] },
+            { "id": 103, "composer": "로시니", "title": "세비야의 이발사", "year": 1816, "category": "성악/오페라", "performances": [] },
+            { "id": 104, "composer": "하이든", "title": "현악4중주 '황제'", "year": 1797, "category": "독주곡", "performances": [] },
+            { "id": 105, "composer": "루치오 달라", "title": "카루소", "year": 1986, "category": "성악/오페라", "performances": [] }
+        ];
+
+        // Realtime Database 실시간 데이터 감지 및 로드
+        onValue(dbRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                tracks = data;
             } else {
-                tracks = initialTracks;
-                localStorage.setItem('classic_library_tracks', JSON.stringify(tracks));
+                tracks = JSON.parse(JSON.stringify(initialTracks));
+                set(dbRef, tracks);
             }
-            renderList();
+            render();
+        });
+
+        function saveToFirebase() {
+            set(dbRef, tracks);
         }
 
-        function renderList() {
-            const container = document.getElementById('libraryContainer');
-            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+        // 전역 범위 스크립트 연결 (버튼 호출용)
+        window.addPerformance = function(trackId, event) {
+            event.preventDefault();
+            const form = event.target;
+            const titleInput = form.querySelector('.perf-title');
+            const urlInput = form.querySelector('.perf-url');
+
+            const title = titleInput.value.trim() || "명연주";
+            const url = urlInput.value.trim();
+
+            if (!url) return;
+
+            const track = tracks.find(t => t.id === trackId);
+            if (track) {
+                if (!track.performances) track.performances = [];
+                track.performances.push({
+                    id: Date.now(),
+                    title: title,
+                    url: url
+                });
+                saveToFirebase();
+            }
+        };
+
+        window.deletePerformance = function(trackId, perfId) {
+            const track = tracks.find(t => t.id === trackId);
+            if (track) {
+                track.performances = track.performances.filter(p => p.id !== perfId);
+                saveToFirebase();
+            }
+        };
+
+        window.resetLibrary = function() {
+            if (confirm("모든 기기의 연주회 링크를 초기 상태로 되돌릴까요?")) {
+                tracks = JSON.parse(JSON.stringify(initialTracks));
+                saveToFirebase();
+            }
+        };
+
+        window.render = function() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const sortOrder = document.getElementById('sortOrder').value;
+            const grid = document.getElementById('libraryGrid');
             
             let filtered = tracks.filter(track => {
-                const matchesSearch = track.composer.toLowerCase().includes(searchVal) || 
-                                      track.title.toLowerCase().includes(searchVal);
-                const matchesCategory = (currentFilter === 'all') || (track.category === currentFilter);
+                const matchesSearch = track.composer.toLowerCase().includes(searchInput) || 
+                                      track.title.toLowerCase().includes(searchInput);
+                const matchesCategory = (categoryFilter === 'all') || (track.category === categoryFilter);
                 return matchesSearch && matchesCategory;
             });
 
-            document.getElementById('trackCount').innerText = filtered.length;
+            filtered.sort((a, b) => {
+                if (sortOrder === 'yearAsc') return a.year - b.year;
+                if (sortOrder === 'yearDesc') return b.year - a.year;
+                if (sortOrder === 'composerAsc') return a.composer.localeCompare(b.composer, 'ko');
+                return 0;
+            });
 
-            if (filtered.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-14 text-slate-400 bg-white rounded-2xl border border-dashed border-slate-200 p-6">
-                        <p class="text-base">검색 결과가 없습니다.<br>리스트를 새로 보강해 보세요!</p>
-                    </div>`;
-                return;
-            }
+            document.getElementById('libraryStats').innerText = `검색 결과: 총 ${filtered.length}곡 / 전체 105곡`;
 
-            container.innerHTML = filtered.map(track => {
-                let performanceButtons = track.performances && track.performances.length > 0 
-                    ? track.performances.map((perf, index) => `
-                        <button onclick="playVideo('${escapeHtml(track.composer)}', '${escapeHtml(track.title)}', '${escapeHtml(perf.performer)}', '${escapeHtml(perf.youtubeUrl)}')" 
-                                class="w-full text-left bg-slate-50 hover:bg-amber-50 border border-slate-100 hover:border-amber-200 rounded-xl px-4 py-3 text-base flex items-center justify-between group transition">
-                            <span class="text-slate-800 group-hover:text-amber-950 font-semibold truncate flex items-center gap-2">
-                                <span class="w-5 h-5 bg-amber-100 group-hover:bg-amber-200 text-amber-800 rounded-full flex items-center justify-center font-bold text-xs">${index + 1}</span>
-                                ${perf.performer}
-                            </span>
-                            <span class="text-sm text-amber-700 bg-amber-50 font-medium px-2.5 py-1 rounded border border-amber-200 flex items-center gap-1 whitespace-nowrap">
-                                ▶ 감상하기
-                            </span>
-                        </button>
-                    `).join('') 
-                    : `<p class="text-sm text-slate-400 italic px-1">등록된 연주 영상 링크가 없습니다.</p>`;
+            grid.innerHTML = filtered.map(track => {
+                const safeCategoryClass = track.category.replace('/', '-');
+                const perfListHtml = (track.performances || []).map(p => `
+                    <li class="performance-item">
+                        <a href="${p.url}" target="_blank">▶ ${p.title}</a>
+                        <button class="delete-btn" onclick="deletePerformance(${track.id}, ${p.id})">×</button>
+                    </li>
+                `).join('');
 
                 return `
-                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 hover:shadow-md transition duration-200">
-                        <div class="flex justify-between items-start gap-2 mb-3">
-                            <div class="flex-1">
-                                <span class="inline-block px-2.5 py-0.5 bg-slate-100 text-slate-600 text-xs font-semibold rounded-md mb-1.5">${track.category}</span>
-                                <h4 class="text-sm font-bold uppercase tracking-wide text-slate-500">${track.composer}</h4>
-                                <h3 class="text-lg font-bold text-slate-900 mt-0.5 leading-snug">${track.title}</h3>
+                    <div class="track-card category-${safeCategoryClass}">
+                        <div>
+                            <div class="track-meta">
+                                <span>${track.category}</span>
+                                <span>${track.year}년경 작곡</span>
                             </div>
-                            <div class="flex flex-col items-end gap-2 shrink-0">
-                                ${track.year ? `<span class="text-xs font-mono font-bold text-slate-400 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-md">${track.year}년</span>` : ''}
-                                <div class="flex gap-1.5 mt-1">
-                                    <button onclick="openEditModal(${track.id})" class="text-slate-400 hover:text-blue-600 bg-slate-50 hover:bg-blue-50 p-2 rounded-md border border-slate-100 hover:border-blue-200 transition" title="수정">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-2.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
-                                    </button>
-                                    <button onclick="deleteTrack(${track.id})" class="text-slate-400 hover:text-rose-600 bg-slate-50 hover:bg-rose-50 p-2 rounded-md border border-slate-100 hover:border-rose-200 transition" title="삭제">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                    </button>
-                                </div>
-                            </div>
+                            <div class="composer">${track.composer}</div>
+                            <div class="title">${track.title}</div>
                         </div>
                         
-                        <div class="mt-3 pt-3 border-t border-slate-100 space-y-2">
-                            <p class="text-xs font-bold text-slate-400 px-1">명연주 리스트 (${track.performances ? track.performances.length : 0}개)</p>
-                            ${performanceButtons}
+                        <div class="performance-section">
+                            <ul class="performance-list">
+                                ${perfListHtml || '<li style="color:#aaa; font-size:12px; font-style:italic;">등록된 명연주 주소가 없습니다.</li>'}
+                            </ul>
+                            <form class="add-link-form" onSubmit="addPerformance(${track.id}, event)">
+                                <input type="text" class="perf-title" placeholder="연주자/설명 (예: 백건우)">
+                                <input type="url" class="perf-url" placeholder="유튜브 URL 링크" required>
+                                <button type="submit">추가</button>
+                            </form>
                         </div>
                     </div>
                 `;
             }).join('');
-        }
+        };
 
-        function filterTracks() {
-            renderList();
-        }
-
-        function filterCategory(cat) {
-            currentFilter = cat;
-            document.querySelectorAll('.category-chip').forEach(btn => {
-                btn.classList.remove('bg-slate-900', 'text-white', 'font-medium');
-                btn.classList.add('bg-slate-100', 'text-slate-600');
-            });
-            const selected = document.getElementById(`chip-${cat}`);
-            if(selected) {
-                selected.classList.remove('bg-slate-100', 'text-slate-600');
-                selected.classList.add('bg-slate-900', 'text-white', 'font-medium');
-            }
-            renderList();
-        }
-
-        function playVideo(composer, title, performer, url) {
-            const iframe = document.getElementById('youtubeIframe');
-            const panel = document.getElementById('globalPlayer');
-            
-            let videoId = '';
-            if (url.includes('v=')) {
-                videoId = url.split('v=')[1].split('&')[0];
-            } else if (url.includes('youtu.be/')) {
-                videoId = url.split('youtu.be/')[1].split('?')[0];
-            } else if (url.includes('embed/')) {
-                videoId = url.split('embed/')[1].split('?')[0];
-            }
-
-            if (!videoId) {
-                alert('유튜브 링크 변환에 실패했습니다. 올바른 주소 형식인지 확인해 주세요.');
-                return;
-            }
-
-            document.getElementById('playerComposer').innerText = composer;
-            document.getElementById('playerTitle').innerText = title;
-            document.getElementById('playerPerformer').innerText = performer;
-            
-            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-            panel.classList.remove('translate-y-full');
-        }
-
-        function closePlayer() {
-            document.getElementById('youtubeIframe').src = '';
-            document.getElementById('globalPlayer').classList.add('translate-y-full');
-        }
-
-        // Add Dynamic Performance Row Input fields
-        function addPerformanceRow(performer = '', url = '') {
-            const container = document.getElementById('performanceInputsContainer');
-            const rowId = 'perf-row-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
-            
-            const div = document.createElement('div');
-            div.id = rowId;
-            div.className = "p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2 relative group";
-            
-            div.innerHTML = `
-                <button type="button" onclick="document.getElementById('${rowId}').remove()" class="absolute top-2 right-2 text-slate-400 hover:text-rose-500 p-1 rounded-md hover:bg-slate-100 transition" title="연주 삭제">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                </button>
-                <div class="pr-6">
-                    <input type="text" class="perf-name-input w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-amber-400 font-semibold" placeholder="연주자 (예: 조성진, 백건우)" value="${escapeHtml(performer)}">
-                </div>
-                <div>
-                    <input type="url" class="perf-url-input w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-amber-400" placeholder="유튜브 링크 (https://...)" value="${escapeHtml(url)}">
-                </div>
-            `;
-            container.appendChild(div);
-        }
-
-        // Modal Open / Controls
-        function openAddModal() {
-            document.getElementById('modalTitleText').innerText = "새로운 클래식 추가";
-            document.getElementById('formTrackId').value = "";
-            document.getElementById('trackForm').reset();
-            document.getElementById('performanceInputsContainer').innerHTML = '';
-            
-            // Default 1 blank row
-            addPerformanceRow('', '');
-            
-            document.getElementById('trackModal').classList.remove('hidden');
-            document.getElementById('trackModal').classList.add('flex');
-        }
-
-        function openEditModal(id) {
-            const track = tracks.find(t => t.id === id);
-            if (!track) return;
-
-            document.getElementById('modalTitleText').innerText = "클래식 정보 수정";
-            document.getElementById('formTrackId').value = track.id;
-            document.getElementById('formComposer').value = track.composer;
-            document.getElementById('formTitle').value = track.title;
-            document.getElementById('formYear').value = track.year || "";
-            document.getElementById('formCategory').value = track.category;
-            
-            const container = document.getElementById('performanceInputsContainer');
-            container.innerHTML = '';
-            
-            if (track.performances && track.performances.length > 0) {
-                track.performances.forEach(perf => {
-                    addPerformanceRow(perf.performer, perf.youtubeUrl);
-                });
-            } else {
-                addPerformanceRow('', '');
-            }
-
-            document.getElementById('trackModal').classList.remove('hidden');
-            document.getElementById('trackModal').classList.add('flex');
-        }
-
-        function closeTrackModal() {
-            document.getElementById('trackModal').classList.remove('flex');
-            document.getElementById('trackModal').classList.add('hidden');
-            document.getElementById('trackForm').reset();
-            document.getElementById('performanceInputsContainer').innerHTML = '';
-        }
-
-        function saveTrackForm(e) {
-            e.preventDefault();
-            
-            const idVal = document.getElementById('formTrackId').value;
-            const composer = document.getElementById('formComposer').value.trim();
-            const title = document.getElementById('formTitle').value.trim();
-            const year = document.getElementById('formYear').value ? parseInt(document.getElementById('formYear').value) : null;
-            const category = document.getElementById('formCategory').value;
-
-            // Extract values dynamically
-            const performances = [];
-            const rows = document.getElementById('performanceInputsContainer').children;
-            for(let i=0; i<rows.length; i++) {
-                const name = rows[i].querySelector('.perf-name-input').value.trim();
-                const url = rows[i].querySelector('.perf-url-input').value.trim();
-                if(name && url) {
-                    performances.push({ performer: name, youtubeUrl: url });
-                }
-            }
-
-            if (idVal) {
-                const targetIndex = tracks.findIndex(t => t.id === parseInt(idVal));
-                if (targetIndex !== -1) {
-                    tracks[targetIndex] = { ...tracks[targetIndex], composer, title, year, category, performances };
-                }
-            } else {
-                const newTrack = { id: Date.now(), composer, title, year, category, performances };
-                tracks.unshift(newTrack);
-            }
-
-            localStorage.setItem('classic_library_tracks', JSON.stringify(tracks));
-            closeTrackModal();
-            renderList();
-        }
-
-        function deleteTrack(id) {
-            if (confirm("이 곡을 라이브러리에서 정말 삭제하시겠습니까?")) {
-                tracks = tracks.filter(t => t.id !== id);
-                localStorage.setItem('classic_library_tracks', JSON.stringify(tracks));
-                renderList();
-            }
-        }
-
-        function escapeHtml(text) {
-            if(!text) return '';
-            return text
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        window.onload = initApp;
+        document.getElementById('searchInput').addEventListener('input', render);
+        document.getElementById('categoryFilter').addEventListener('change', render);
+        document.getElementById('sortOrder').addEventListener('change', render);
     </script>
 </body>
 </html>
