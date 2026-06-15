@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>클래식 라이브러리 (Classic Library)</title>
+    <!-- Tailwind CSS cdn -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;700&family=Pretendard:wght@300;400;600&display=swap');
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #f8fafc;
+        }
+        .serif-title {
+            font-family: 'Noto Serif KR', serif;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased pb-24">
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-md transition-all">
+        <div class="max-w-md mx-auto px-4 py-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-bold serif-title tracking-wide text-amber-400">Classic Library</h1>
+                <p class="text-xs text-slate-400 font-light mt-0.5">나만의 영혼을 채우는 명곡 아카이브</p>
+            </div>
+            <button onclick="openAddModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold text-sm px-3 py-1.5 rounded-full shadow transition flex items-center gap-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
+                추가
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Container (Mobile Max Width Constrained for App Vibe) -->
+    <main class="max-w-md mx-auto px-4 py-6">
+        
+        <!-- Search & Filter Bar -->
+        <div class="mb-6 bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
+            <div class="relative mb-3">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                </span>
+                <input type="text" id="searchInput" oninput="filterTracks()" class="w-full bg-slate-50 text-slate-900 placeholder-slate-400 text-sm rounded-xl pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-amber-400 border border-transparent transition" placeholder="작곡가, 곡명으로 검색...">
+            </div>
+            
+            <!-- Category Chips -->
+            <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-none text-xs">
+                <button onclick="filterCategory('all')" id="chip-all" class="category-chip px-3 py-1.5 rounded-full bg-slate-900 text-white font-medium whitespace-nowrap transition">전체</button>
+                <button onclick="filterCategory('교향곡')" id="chip-교향곡" class="category-chip px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">교향곡</button>
+                <button onclick="filterCategory('협주곡')" id="chip-협주곡" class="category-chip px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">협주곡</button>
+                <button onclick="filterCategory('독주곡')" id="chip-독주곡" class="category-chip px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">독주곡/실내악</button>
+                <button onclick="filterCategory('성악/오페라')" id="chip-성악/오페라" class="category-chip px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">성악/오페라</button>
+            </div>
+        </div>
+
+        <!-- Library Stats -->
+        <div class="flex justify-between items-center mb-4 px-1 text-xs text-slate-500">
+            <div>보관된 명곡 <span id="trackCount" class="font-semibold text-slate-800">0</span>개</div>
+            <div class="flex items-center gap-1 text-amber-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                나만의 엄선 큐레이션
+            </div>
+        </div>
+
+        <!-- Dynamic List Container -->
+        <div id="libraryContainer" class="space-y-4">
+            <!-- JavaScript will inject card items here -->
+        </div>
+
+    </main>
+
+    <!-- Sticky Video Player Panel (Hidden by default, rises from bottom) -->
+    <div id="globalPlayer" class="fixed bottom-0 inset-x-0 bg-slate-900 text-white shadow-2xl border-t border-slate-800 transform translate-y-full transition-transform duration-300 z-50 rounded-t-2xl">
+        <div class="max-w-md mx-auto p-4">
+            <div class="flex justify-between items-start mb-3">
+                <div class="pr-4">
+                    <span id="playerComposer" class="text-xs font-semibold uppercase tracking-wider text-amber-400 block">작곡가</span>
+                    <h3 id="playerTitle" class="text-sm font-medium line-clamp-1 text-slate-100">재생 중인 곡 제목</h3>
+                    <p id="playerPerformer" class="text-xs text-slate-400 mt-0.5 line-clamp-1">연주자 정보</p>
+                </div>
+                <button onclick="closePlayer()" class="text-slate-400 hover:text-white p-1 rounded-full hover:bg-slate-800 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l1.414 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                </button>
+            </div>
+            
+            <!-- Video Responsive Wrapper -->
+            <div class="relative aspect-video rounded-xl overflow-hidden bg-black shadow-inner">
+                <iframe id="youtubeIframe" class="absolute inset-0 w-full h-full" src="" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Track Modal (Popup Form) -->
+    <div id="addModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50 transition-opacity">
+        <div class="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+            <div class="bg-slate-900 text-white px-5 py-4 flex justify-between items-center">
+                <h3 class="font-bold serif-title text-amber-400 text-base">새로운 클래식 추가</h3>
+                <button onclick="closeAddModal()" class="text-slate-400 hover:text-white transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l1.414 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                </button>
+            </div>
+            <form id="addForm" onsubmit="saveNewTrack(event)" class="p-5 space-y-3.5 text-sm">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">작곡가 <span class="text-rose-500">*</span></label>
+                    <input type="text" id="formComposer" required class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-slate-50" placeholder="예: 바흐, 베토벤, 쇼팽">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">곡명 <span class="text-rose-500">*</span></label>
+                    <input type="text" id="formTitle" required class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-slate-50" placeholder="예: Nocturne No.2 in E-flat major">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">작곡년도</label>
+                        <input type="number" id="formYear" class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-slate-50" placeholder="예: 1830">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 mb-1">카테고리</label>
+                        <select id="formCategory" class="w-full border border-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-slate-50">
+                            <option value="독주곡">독주곡/실내악</option>
+                            <option value="교향곡">교향곡</option>
+                            <option value="협주곡">협주곡</option>
+                            <option value="성악/오페라">성악/오페라</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="border-t border-dashed border-slate-100 my-2 pt-2">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">대표 연주 정보 (첫 번째 링크)</label>
+                    <input type="text" id="formPerformer" class="w-full border border-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-slate-50 mb-2" placeholder="연주자 이름 (예: 조성진, 카라얀)">
+                    <input type="url" id="formYoutube" class="w-full border border-slate-200 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-amber-400 bg-slate-50" placeholder="유튜브 주소 (https://...)">
+                </div>
+                <div class="flex gap-2.5 pt-2">
+                    <button type="button" onclick="closeAddModal()" class="w-1/3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium py-2.5 rounded-xl transition">취소</button>
+                    <button type="submit" class="w-2/3 bg-slate-900 hover:bg-slate-800 text-white font-medium py-2.5 rounded-xl transition shadow-md">라이브러리에 저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Web Logic Framework -->
+    <script>
+        // Sample Initial Data (Prototype Setup)
+        const initialTracks = [
+            {
+                id: 1,
+                composer: "Ludwig van Beethoven",
+                title: "Piano Sonata No. 14 in C-sharp minor, Op. 27, No. 2 'Moonlight' (월광)",
+                year: 1801,
+                category: "독주곡",
+                performances: [
+                    { performer: "백건우 (Kun-Woo Paik)", youtubeUrl: "https://www.youtube.com/watch?v=S8L69v7Z_3E" },
+                    { performer: "Daniel Barenboim", youtubeUrl: "https://www.youtube.com/watch?v=nT7_IZPHHb0" }
+                ]
+            },
+            {
+                id: 2,
+                composer: "Frédéric Chopin",
+                title: "Ballade No. 1 in G minor, Op. 23",
+                year: 1835,
+                category: "독주곡",
+                performances: [
+                    { performer: "조성진 (Seong-Jin Cho) - 쇼팽 콩쿠르 실황", youtubeUrl: "https://www.youtube.com/watch?v=614OSs9BSeQ" },
+                    { performer: "Krystian Zimerman", youtubeUrl: "https://www.youtube.com/watch?v=jZ8SgXg9a8s" }
+                ]
+            },
+            {
+                id: 3,
+                composer: "Johannes Brahms",
+                title: "Symphony No. 4 in E minor, Op. 98",
+                year: 1885,
+                category: "교향곡",
+                performances: [
+                    { performer: "Carlos Kleiber / Vienna Philharmonic", youtubeUrl: "https://www.youtube.com/watch?v=W60CH514K9w" }
+                ]
+            },
+            {
+                id: 4,
+                composer: "Johann Sebastian Bach",
+                title: "Cello Suite No. 1 in G major, BWV 1007",
+                year: 1720,
+                category: "독주곡",
+                performances: [
+                    { performer: "Yo-Yo Ma", youtubeUrl: "https://www.youtube.com/watch?v=1prweT95Mo0" },
+                    { performer: "Pablo Casals (1936 historical rec.)", youtubeUrl: "https://www.youtube.com/watch?v=VhcjeZ3o5us" }
+                ]
+            },
+            {
+                id: 5,
+                composer: "Pyotr Ilyich Tchaikovsky",
+                title: "Piano Concerto No. 1 in B-flat minor, Op. 23",
+                year: 1875,
+                category: "협주곡",
+                performances: [
+                    { performer: "임윤찬 (Yunchan Lim) / 정명훈 지음", youtubeUrl: "https://www.youtube.com/watch?v=VPvW8Zk8m68" },
+                    { performer: "Martha Argerich (1975 live)", youtubeUrl: "https://www.youtube.com/watch?v=ItSJ_woWnm8" }
+                ]
+            }
+        ];
+
+        // State variables
+        let tracks = [];
+        let currentFilter = 'all';
+
+        // Initialize App Database from localStorage or defaults
+        function initApp() {
+            const stored = localStorage.getItem('classic_library_tracks');
+            if (stored) {
+                tracks = JSON.parse(stored);
+            } else {
+                tracks = initialTracks;
+                localStorage.setItem('classic_library_tracks', JSON.stringify(tracks));
+            }
+            renderList();
+        }
+
+        // Render UI Cards List
+        function renderList() {
+            const container = document.getElementById('libraryContainer');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            
+            // Filtering logic
+            let filtered = tracks.filter(track => {
+                const matchesSearch = track.composer.toLowerCase().includes(searchVal) || 
+                                      track.title.toLowerCase().includes(searchVal);
+                const matchesCategory = (currentFilter === 'all') || (track.category === currentFilter);
+                return matchesSearch && matchesCategory;
+            });
+
+            // Update stats count
+            document.getElementById('trackCount').innerText = filtered.length;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 text-slate-400 bg-white rounded-2xl border border-dashed border-slate-200 p-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto mb-2 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <p class="text-sm">해당하는 명곡이 아직 없습니다.<br>오른쪽 위 버튼으로 직접 추가해 보세요!</p>
+                    </div>`;
+                return;
+            }
+
+            // HTML string building for high performance
+            container.innerHTML = filtered.map(track => {
+                // Generate execution links
+                let performanceButtons = track.performances && track.performances.length > 0 
+                    ? track.performances.map((perf, index) => `
+                        <button onclick="playVideo('${escapeHtml(track.composer)}', '${escapeHtml(track.title)}', '${escapeHtml(perf.performer)}', '${escapeHtml(perf.youtubeUrl)}')" 
+                                class="w-full text-left bg-slate-50 hover:bg-amber-50 border border-slate-100 hover:border-amber-200 rounded-xl px-3 py-2 text-xs flex items-center justify-between group transition">
+                            <span class="text-slate-700 group-hover:text-amber-900 font-medium truncate flex items-center gap-2">
+                                <span class="w-4 h-4 bg-amber-100 group-hover:bg-amber-200 text-amber-700 rounded-full flex items-center justify-center font-bold text-[10px]">${index + 1}</span>
+                                ${perf.performer}
+                            </span>
+                            <span class="text-[10px] text-slate-400 group-hover:text-amber-600 bg-white px-1.5 py-0.5 rounded border flex items-center gap-0.5 whitespace-nowrap">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-2.5 w-2.5 fill-rose-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd" /></svg>
+                                감상하기
+                            </span>
+                        </button>
+                    `).join('') 
+                    : `<p class="text-xs text-slate-400 italic px-1">등록된 명연주 영상 링크가 없습니다.</p>`;
+
+                return `
+                    <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition duration-200">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <span class="inline-block px-2 py-0.5 bg-slate-100 text-slate-600 text-[10px] font-medium rounded-md mb-1">${track.category}</span>
+                                <h4 class="text-xs font-bold uppercase tracking-wide text-slate-500">${track.composer}</h4>
+                                <h3 class="text-sm font-semibold text-slate-900 mt-0.5 leading-snug">${track.title}</h3>
+                            </div>
+                            ${track.year ? `<span class="text-[11px] font-mono font-medium text-slate-400 bg-slate-50 border border-slate-100 px-1.5 py-0.5 rounded-md">${track.year}년</span>` : ''}
+                        </div>
+                        
+                        <!-- Collapsible / Standard List of Performances -->
+                        <div class="mt-3 pt-3 border-t border-slate-50 space-y-1.5">
+                            <p class="text-[11px] font-semibold text-slate-400 mb-1 px-1">명연주 리스트</p>
+                            ${performanceButtons}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Search trigger
+        function filterTracks() {
+            renderList();
+        }
+
+        // Category Switcher
+        function filterCategory(cat) {
+            currentFilter = cat;
+            document.querySelectorAll('.category-chip').forEach(btn => {
+                btn.classList.remove('bg-slate-900', 'text-white', 'font-medium');
+                btn.classList.add('bg-slate-100', 'text-slate-600');
+            });
+            const selected = document.getElementById(`chip-${cat}`);
+            if(selected) {
+                selected.classList.remove('bg-slate-100', 'text-slate-600');
+                selected.classList.add('bg-slate-900', 'text-white', 'font-medium');
+            }
+            renderList();
+        }
+
+        // Global Youtube Player Trigger
+        function playVideo(composer, title, performer, url) {
+            const iframe = document.getElementById('youtubeIframe');
+            const panel = document.getElementById('globalPlayer');
+            
+            // Extract Video ID from common youtube structures
+            let videoId = '';
+            if (url.includes('v=')) {
+                videoId = url.split('v=')[1].split('&')[0];
+            } else if (url.includes('youtu.be/')) {
+                videoId = url.split('youtu.be/')[1].split('?')[0];
+            } else if (url.includes('embed/')) {
+                videoId = url.split('embed/')[1].split('?')[0];
+            }
+
+            if (!videoId) {
+                alert('유효한 유튜브 주소가 아니거나 변환에 실패했습니다. 링크를 직접 확인해 주세요.');
+                return;
+            }
+
+            // Set content details
+            document.getElementById('playerComposer').innerText = composer;
+            document.getElementById('playerTitle').innerText = title;
+            document.getElementById('playerPerformer').innerText = performer;
+            
+            // Load and display embedded stream
+            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            panel.classList.remove('translate-y-full');
+        }
+
+        function closePlayer() {
+            const iframe = document.getElementById('youtubeIframe');
+            const panel = document.getElementById('globalPlayer');
+            iframe.src = ''; // stop playback
+            panel.classList.add('translate-y-full');
+        }
+
+        // Modal triggers
+        function openAddModal() {
+            document.getElementById('addModal').classList.remove('hidden');
+            document.getElementById('addModal').classList.add('flex');
+        }
+        function closeAddModal() {
+            document.getElementById('addModal').classList.remove('flex');
+            document.getElementById('addModal').classList.add('hidden');
+            document.getElementById('addForm').reset();
+        }
+
+        // Action: Submit Form and Store Real Data
+        function saveNewTrack(e) {
+            e.preventDefault();
+            
+            const composer = document.getElementById('formComposer').value.trim();
+            const title = document.getElementById('formTitle').value.trim();
+            const year = document.getElementById('formYear').value ? parseInt(document.getElementById('formYear').value) : null;
+            const category = document.getElementById('formCategory').value;
+            const performer = document.getElementById('formPerformer').value.trim();
+            const youtubeUrl = document.getElementById('formYoutube').value.trim();
+
+            const performances = [];
+            if (performer && youtubeUrl) {
+                performances.push({ performer, youtubeUrl });
+            }
+
+            const newTrack = {
+                id: Date.now(), // simple timestamp id
+                composer,
+                title,
+                year,
+                category,
+                performances
+            };
+
+            tracks.unshift(newTrack); // Add to beginning
+            localStorage.setItem('classic_library_tracks', JSON.stringify(tracks));
+            
+            closeAddModal();
+            renderList();
+        }
+
+        // Helper to escape HTML characters for safe injection
+        function escapeHtml(text) {
+            if(!text) return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Boot the app
+        window.onload = initApp;
+    </script>
+</body>
+</html>
+index.html
+index.html 항목을 표시하는 중입니다.
