@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Classical Music Library</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .card { transition: all 0.2s; cursor: pointer; }
@@ -33,7 +33,7 @@
             <div class="flex gap-1.5 justify-end flex-wrap">
                 <button id="btnShowAll" class="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-gray-700 font-semibold rounded-lg text-xs transition">전체보기</button>
                 <button id="btnAddTrack" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition"><i class="fas fa-plus mr-1"></i>새로운 곡 추가</button>
-                </div>
+            </div>
         </section>
 
         <div id="loadingStatus" class="text-center py-12 text-gray-500 font-medium">
@@ -44,7 +44,7 @@
             </section>
     </main>
 
-    <div id="trackModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 hidden z-50">
+    <div id="trackModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden z-50">
         <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-5">
             <h2 id="modalTitle" class="text-lg font-bold text-gray-900 mb-4">곡 정보 수정</h2>
             <input type="hidden" id="modalTrackId">
@@ -86,22 +86,21 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // Firebase 프로젝트 설정
         const firebaseConfig = {
-            apiKey: "AIzaSyC0vb9iYY8Rgt6TJelolyl0QECCjTYZJ0g",
+            apiKey: "AIzaSyC0vb9iYY8Rgt6TJelolyl0QECCjTYZJ0g", // 👈 사용자님의 실제 키값으로 교체해 주세요!
             authDomain: "classiclibrary-64b1e.firebaseapp.com",
-            databaseURL: "https://classiclibrary-64b1e-default-rtdb.firebaseio.com", // 이 줄이 잘 매칭되어 있는지 꼭 확인하세요!
+            databaseURL: "https://classiclibrary-64b1e-default-rtdb.firebaseio.com",
             projectId: "classiclibrary-64b1e",
-            storageBucket: "classiclibrary-64b1e.firebasestorage.app",
-            messagingSenderId: "691470936171",
-            appId: "1:691470936171:web:57d82fda0b031494b4692e"
+            storageBucket: "classiclibrary-64b1e.appspot.com",
+            messagingSenderId: "1019688174542",
+            appId: "1:1019688174542:web:96e1a49f532f1a60be6a32"
         };
 
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
         const dbRef = ref(database, "classic_library");
 
-        // 초기 데이터 백업 구조 (Firebase가 완전히 비어있을 때 최초 1회만 구동되는 백업 세트입니다)
+        // 초기 데이터 백업 구조
         const initialTracks = [
             null,
             { id: 1, composer: "베토벤", title: "바이올린 협주곡 D장조", year: 1806, category: "협주곡" },
@@ -163,70 +162,80 @@
             { id: 57, composer: "거슈윈", title: "랩소디 인 블루", year: 1924, category: "협주곡" },
             { id: 58, composer: "바흐", title: "골드베르크 변주곡", year: 1741, category: "독주곡" },
             { id: 59, composer: "쇼팽", title: "피아노 협주곡 2번", year: 1830, category: "협주곡" },
-            { id: 60, composer: "비제", "title": "아를르의 여인", "year": 1872, "category": "교향곡" },
-            { id: 61, composer: "드보르자크", "title": "교향곡 9번 '신세계'", "year": 1893, "category": "교향곡" },
-            { id: 62, composer: "리스트", "title": "헝가리 광시곡", "year": 1847, "category": "독주곡" },
-            { id: 63, composer: "알베니스", "title": "아스투리아스", "year": 1892, "category": "독주곡" },
-            { id: 64, composer: "모차르트", "title": "환상곡 K.397", "year": 1782, "category": "독주곡" },
-            { id: 65, composer: "바흐", "title": "시칠리아노 BWV1031", "year": 1730, "category": "독주곡" },
-            { id: 66, composer: "모차르트", "title": "피아노 소나타 12번 K.332", "year": 1783, "category": "독주곡" },
-            { id: 67, composer: "라벨", "title": "죽은 왕녀를 위한 파반느", "year": 1899, "category": "독주곡" },
-            { id: 68, composer: "포레", "title": "파반느 Op.50", "year": 1887, "category": "교향곡" },
-            { id: 69, composer: "멘델스존", "title": "핑갈의 동굴", "year": 1830, "category": "교향곡" },
-            { id: 70, composer: "드뷔시", "title": "목신의 오후 전주곡", "year": 1894, "category": "교향곡" },
-            { id: 71, composer: "드보르자크", "title": "슬라브 무곡", "year": 1878, "category": "교향곡" },
-            { id: 72, composer: "바그너", "title": "탄호이저 서곡", "year": 1845, "category": "성악/오페라" },
-            { id: 73, composer: "브람스", "title": "대학축전 서곡", "year": 1880, "category": "교향곡" },
-            { id: 74, composer: "모차르트", "title": "피가로의 결혼", "year": 1786, "category": "성악/오페라" },
-            { id: 75, composer: "베르디", "title": "오페라 작품들", "year": 1850, "category": "성악/오페라" },
-            { id: 76, composer: "번스타인", "title": "웨스트 사이드 스토리", "year": 1957, "category": "성악/오페라" },
-            { id: 77, composer: "프랑크", "title": "바이올린 소나타 A장조", "year": 1886, "category": "독주곡" },
-            { id: 78, composer: "그리그", "title": "페르귄트 모음곡", "year": 1875, "category": "교향곡" },
-            { id: 79, composer: "거슈윈", "title": "포기와 베스 - Summertime", "year": 1935, "category": "성악/오페라" },
-            { id: 80, composer: "베토벤", "title": "발트슈타인 소나타", "year": 1804, "category": "독주곡" },
-            { id: 81, composer: "비발디", "title": "세상에 참 평화없어라", "year": 1725, "category": "성악/오페라" },
-            { id: 82, composer: "칼 젠킨스", "title": "팔라디오", "year": 1995, "category": "교향곡" },
-            { id: 83, composer: "바흐", "title": "바이올린 협주곡 1번", "year": 1730, "category": "협주곡" },
-            { id: 84, composer: "바흐", "title": "바이올린과 오보에를 위한 협주곡", "year": 1730, "category": "협주곡" },
-            { id: 85, composer: "라흐마니노프", "title": "피아노 협주곡 2번", "year": 1901, "category": "협주곡" },
-            { id: 86, composer: "라흐마니노프", "title": "피아노 협주곡 3번", "year": 1909, "category": "협주곡" },
-            { id: 87, composer: "라흐마니노프", "title": "교향곡 2번", "year": 1907, "category": "교향곡" },
-            { id: 88, composer: "마르첼로", "title": "오보에 협주곡 D단조", "year": 1717, "category": "협주곡" },
-            { id: 89, composer: "벨리니", "title": "노르마", "year": 1831, "category": "성악/오페라" },
-            { id: 90, composer: "비발디", "title": "두 대의 트럼펫을 위한 협주곡", "year": 1720, "category": "협주곡" },
-            { id: 91, composer: "파가니니", "title": "바이올린과 기타를 위한 소나타", "year": 1803, "category": "독주곡" },
-            { id: 92, composer: "헨델", "title": "울게 하소서", "year": 1711, "category": "성악/오페라" },
-            { id: 93, composer: "베토벤", "title": "비창 소나타", "year": 1798, "category": "독주곡" },
-            { id: 94, composer: "로시니", "title": "윌리엄 텔 서곡", "year": 1829, "category": "성악/오페라" },
-            { id: 95, composer: "로드리고", "title": "어느 귀인을 위한 환상곡", "year": 1954, "category": "협주곡" },
-            { id: 96, composer: "베토벤", "title": "교향곡 7번", "year": 1812, "category": "교향곡" },
-            { id: 97, composer: "바버", "title": "현을 위한 아다지오 Op.11", "year": 1936, "category": "교향곡" },
-            { id: 98, composer: "피아졸라", "title": "오블리비온", "year": 1982, "category": "독주곡" },
-            { id: 99, composer: "피아졸라", "title": "리베르탱고", "year": 1974, "category": "독주곡" },
-            { id: 100, composer: "모차르트", "title": "피가로의 결혼 중 편지의 이중창", "year": 1786, "category": "성악/오페라" },
-            { id: 101, composer: "모차르트", "title": "돈 조반니", "year": 1787, "category": "성악/오페라" },
-            { id: 102, composer: "모차르트", "title": "마술피리", "year": 1791, "category": "성악/오페라" },
-            { id: 103, composer: "로시니", "title": "세비야의 이발사", "year": 1816, "category": "성악/오페라" },
-            { id: 104, composer: "하이든", "title": "현악4중주 '황제'", "year": 1797, "category": "독주곡" },
+            { id: 60, composer: "비제", title: "아를르의 여인", year: 1872, category: "교향곡" },
+            { id: 61, composer: "드보르자크", title: "교향곡 9번 '신세계'", year: 1893, category: "교향곡" },
+            { id: 62, composer: "리스트", title: "헝가리 광시곡", year: 1847, category: "독주곡" },
+            { id: 63, composer: "알베니스", title: "아스투리아스", year: 1892, category: "독주곡" },
+            { id: 64, composer: "모차르트", title: "환상곡 K.397", year: 1782, category: "독주곡" },
+            { id: 65, composer: "바흐", title: "시칠리아노 BWV1031", year: 1730, category: "독주곡" },
+            { id: 66, composer: "모차르트", title: "피아노 소나타 12번 K.332", year: 1783, category: "독주곡" },
+            { id: 67, composer: "라벨", title: "죽은 왕녀를 위한 파반느", year: 1899, category: "독주곡" },
+            { id: 68, composer: "포레", title: "파반느 Op.50", year: 1887, category: "교향곡" },
+            { id: 69, composer: "멘델스존", title: "핑갈의 동굴", year: 1830, category: "교향곡" },
+            { id: 70, composer: "드뷔시", title: "목신의 오후 전주곡", year: 1894, category: "교향곡" },
+            { id: 71, composer: "드보르자크", title: "슬라브 무곡", year: 1878, category: "교향곡" },
+            { id: 72, composer: "바그너", title: "탄호이저 서곡", year: 1845, category: "성악/오페라" },
+            { id: 73, composer: "브람스", title: "대학축전 서곡", year: 1880, category: "교향곡" },
+            { id: 74, composer: "모차르트", title: "피가로의 결혼", year: 1786, category: "성악/오페라" },
+            { id: 75, composer: "베르디", title: "오페라 작품들", year: 1850, category: "성악/오페라" },
+            { id: 76, composer: "번스타인", title: "웨스트 사이드 스토리", year: 1957, category: "성악/오페라" },
+            { id: 77, composer: "프랑크", title: "바이올린 소나타 A장조", year: 1886, category: "독주곡" },
+            { id: 78, composer: "그리그", title: "페르귄트 모음곡", year: 1875, category: "교향곡" },
+            { id: 79, composer: "거슈윈", title: "포기와 베스 - Summertime", year: 1935, category: "성악/오페라" },
+            { id: 80, composer: "베토벤", title: "발트슈타인 소나타", year: 1804, category: "독주곡" },
+            { id: 81, composer: "비발디", title: "세상에 참 평화없어라", year: 1725, category: "성악/오페라" },
+            { id: 82, composer: "칼 젠킨스", title: "팔라디오", year: 1995, category: "교향곡" },
+            { id: 83, composer: "바흐", title: "바이올린 협주곡 1번", year: 1730, category: "협주곡" },
+            { id: 84, composer: "바흐", title: "바이올린과 오보에를 위한 협주곡", year: 1730, category: "협주곡" },
+            { id: 85, composer: "라흐마니노프", title: "피아노 협주곡 2번", year: 1901, category: "협주곡" },
+            { id: 86, composer: "라흐마니노프", title: "피아노 협주곡 3번", year: 1909, category: "협주곡" },
+            { id: 87, composer: "라흐마니노프", title: "교향곡 2번", year: 1907, category: "교향곡" },
+            { id: 88, composer: "마르첼로", title: "오보에 협주곡 D단조", year: 1717, category: "협주곡" },
+            { id: 89, composer: "벨리니", title: "노르마", year: 1831, category: "성악/오페라" },
+            { id: 90, composer: "비발디", title: "두 대의 트럼펫을 위한 협주곡", year: 1720, category: "협주곡" },
+            { id: 91, composer: "파가니니", title: "바이올린과 기타를 위한 소나타", year: 1803, category: "독주곡" },
+            { id: 92, composer: "헨델", title: "울게 하소서", year: 1711, category: "성악/오페라" },
+            { id: 93, composer: "베토벤", title: "비창 소나타", year: 1798, category: "독주곡" },
+            { id: 94, composer: "로시니", title: "윌리엄 텔 서곡", year: 1829, category: "성악/오페라" },
+            { id: 95, composer: "로드리고", title: "어느 귀인을 위한 환상곡", year: 1954, category: "협주곡" },
+            { id: 96, composer: "베토벤", title: "교향곡 7번", year: 1812, category: "교향곡" },
+            { id: 97, composer: "바버", title: "현을 위한 아다지오 Op.11", year: 1936, category: "교향곡" },
+            { id: 98, composer: "피아졸라", title: "오블리비온", year: 1982, category: "독주곡" },
+            { id: 99, composer: "피아졸라", title: "리베르탱고", year: 1974, category: "독주곡" },
+            { id: 100, composer: "모차르트", title: "피가로의 결혼 중 편지의 이중창", year: 1786, category: "성악/오페라" },
+            { id: 101, composer: "모차르트", title: "돈 조반니", year: 1787, category: "성악/오페라" },
+            { id: 102, composer: "모차르트", title: "마술피리", year: 1791, category: "성악/오페라" },
+            { id: 103, composer: "로시니", title: "세비야의 이발사", year: 1816, category: "성악/오페라" },
+            { id: 104, composer: "하이든", title: "현악4중주 '황제'", year: 1797, category: "독주곡" },
             { id: 105, composer: "루치오 달라", "title": "카루소", "year": 1986, "category": "성악/오페라" }
         ];
 
         let tracks = [];
 
-        // Firebase 수신 데이터베이스 감시
+        // Firebase 실시간 데이터 가져오기
         onValue(dbRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                tracks = data;
-            } else {
-                tracks = JSON.parse(JSON.stringify(initialTracks));
-                set(dbRef, tracks);
+            try {
+                const data = snapshot.val();
+                if (data) {
+                    // 💡 객체든 배열이든 오류 없이 값만 순수하게 가공해내는 안전장치입니다.
+                    tracks = Array.isArray(data) ? data : Object.values(data);
+                } else {
+                    tracks = JSON.parse(JSON.stringify(initialTracks));
+                    set(dbRef, tracks);
+                }
+            } catch (e) {
+                console.error("데이터 로드 에러:", e);
+            } finally {
+                // 💡 어떤 예외 상황이 오더라도 로딩 상태를 무조건 종료하는 탈출구입니다.
+                initApp();
             }
-            initApp();
+        }, (error) => {
+            console.error("Firebase 연결 에러:", error);
+            initApp(); 
         });
 
         function initApp() {
-            document.getElementById('loadingStatus').classList.add('hidden');
+            document.getElementById('loadingStatus').style.display = 'none';
             document.getElementById('libraryGrid').classList.remove('hidden');
             initFilters();
             render();
@@ -249,4 +258,124 @@
             });
         }
 
-        // 컴
+        function render() {
+            const grid = document.getElementById('libraryGrid');
+            const searchKeyword = document.getElementById('searchInput').value.toLowerCase();
+            const selectedCategory = document.getElementById('categoryFilter').value || '전체 장르';
+            const sortOrder = document.getElementById('sortOrder').value;
+
+            grid.innerHTML = '';
+            // null 값 안전 필터링
+            let filtered = tracks.filter(t => t !== null && t !== undefined && t.id);
+
+            if (searchKeyword) {
+                filtered = filtered.filter(t => 
+                    (t.composer && t.composer.toLowerCase().includes(searchKeyword)) || 
+                    (t.title && t.title.toLowerCase().includes(searchKeyword))
+                );
+            }
+
+            if (selectedCategory !== '전체 장르') {
+                filtered = filtered.filter(t => t.category === selectedCategory);
+            }
+
+            if (sortOrder === 'composer') {
+                filtered.sort((a, b) => (a.composer || '').localeCompare(b.composer || '', 'ko'));
+            } else if (sortOrder === 'yearAsc') {
+                filtered.sort((a, b) => (a.year || 0) - (b.year || 0));
+            } else {
+                filtered.sort((a, b) => a.id - b.id);
+            }
+
+            filtered.forEach(track => {
+                const card = document.createElement('div');
+                card.className = "card bg-white p-3 rounded-lg shadow-sm border border-gray-100 flex flex-col justify-between h-28";
+                card.onclick = () => openEditModal(track.id);
+                
+                card.innerHTML = `
+                    <div class="overflow-hidden">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[10px] font-bold text-slate-400">No.${track.id}</span>
+                            <span class="text-[10px] font-medium text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">${track.category || '기타'}</span>
+                        </div>
+                        <h3 class="font-bold text-gray-900 leading-tight truncate mb-0.5" title="${track.title}">${track.title}</h3>
+                    </div>
+                    <div class="text-xs text-gray-600 font-medium border-t border-gray-50 pt-1.5 flex justify-between">
+                        <span class="truncate">${track.composer}</span>
+                        <span class="text-gray-500 font-normal flex-shrink-0 ml-1">${track.year || 0}년</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function openEditModal(id) {
+            const track = tracks.find(t => t && t.id === id);
+            if (!track) return;
+
+            document.getElementById('modalTitle').textContent = "곡 정보 수정 및 링크";
+            document.getElementById('modalTrackId').value = track.id;
+            document.getElementById('modalTitleInput').value = track.title || '';
+            document.getElementById('modalComposerInput').value = track.composer || '';
+            document.getElementById('modalYearInput').value = track.year || '';
+            document.getElementById('modalCategoryInput').value = track.category || '';
+            
+            const query = encodeURIComponent(`${track.composer} ${track.title}`);
+            document.getElementById('btnYoutube').href = `https://www.youtube.com/results?search_query=${query}`;
+            document.getElementById('btnYoutube').classList.remove('hidden');
+
+            document.getElementById('trackModal').classList.remove('hidden');
+        }
+
+        document.getElementById('btnAddTrack').addEventListener('click', () => {
+            const validTracks = tracks.filter(t => t !== null && t !== undefined);
+            const nextId = validTracks.length > 0 ? Math.max(...validTracks.map(t => t.id)) + 1 : 1;
+
+            document.getElementById('modalTitle').textContent = "새로운 명곡 추가";
+            document.getElementById('modalTrackId').value = nextId;
+            document.getElementById('modalTitleInput').value = "";
+            document.getElementById('modalComposerInput').value = "";
+            document.getElementById('modalYearInput').value = new Date().getFullYear();
+            document.getElementById('modalCategoryInput').value = "협주곡";
+            
+            document.getElementById('btnYoutube').classList.add('hidden');
+            document.getElementById('trackModal').classList.remove('hidden');
+        });
+
+        document.getElementById('btnSaveModal').addEventListener('click', () => {
+            const id = parseInt(document.getElementById('modalTrackId').value);
+            const title = document.getElementById('modalTitleInput').value.trim();
+            const composer = document.getElementById('modalComposerInput').value.trim();
+            const year = parseInt(document.getElementById('modalYearInput').value) || 0;
+            const category = document.getElementById('modalCategoryInput').value.trim();
+
+            if (!title || !composer) {
+                alert("작품명과 작곡가는 필수 입력 사항입니다.");
+                return;
+            }
+
+            const newTrack = { id, title, composer, year, category };
+            tracks[id] = newTrack;
+
+            set(dbRef, tracks).then(() => {
+                document.getElementById('trackModal').classList.add('hidden');
+            }).catch(err => alert("저장 실패: " + err.message));
+        });
+
+        document.getElementById('btnCancelModal').addEventListener('click', () => {
+            document.getElementById('trackModal').classList.add('hidden');
+        });
+
+        document.getElementById('searchInput').addEventListener('input', render);
+        document.getElementById('categoryFilter').addEventListener('change', render);
+        document.getElementById('sortOrder').addEventListener('change', render);
+        
+        document.getElementById('btnShowAll').addEventListener('click', () => {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = '전체 장르';
+            document.getElementById('sortOrder').value = 'default';
+            render();
+        });
+    </script>
+</body>
+</html>
