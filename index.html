@@ -7,48 +7,86 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .card { transition: transform 0.2s, box-shadow 0.2s; }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .card { transition: all 0.2s; cursor: pointer; }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 min-h-screen pb-12">
+<body class="bg-gray-50 text-gray-800 min-h-screen pb-12 text-sm">
 
-    <header class="bg-slate-800 text-white py-12 px-4 text-center shadow-md mb-8">
-        <h1 class="text-3xl md:text-4xl font-bold tracking-wide mb-2">My Classical Music Library</h1>
-        <p class="text-slate-300 text-sm md:text-base font-light">나만의 실시간 명연주 기록 보관소</p>
+    <header class="bg-slate-800 text-white py-6 px-4 text-center shadow-md mb-4">
+        <h1 class="text-2xl md:text-3xl font-bold tracking-wide mb-1">My Classical Music Library</h1>
+        <p class="text-slate-300 text-xs font-light">나만의 실시간 명연주 기록 보관소</p>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4">
+    <main class="max-w-7xl mx-auto px-2">
         
-        <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <input type="text" id="searchInput" placeholder="작곡가 또는 작품명 검색..." class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-slate-500">
-                <select id="categoryFilter" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-slate-500"></select>
-                <select id="sortOrder" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-slate-500">
+        <section class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
+                <input type="text" id="searchInput" placeholder="작곡가 또는 작품명 검색..." class="w-full px-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-slate-500">
+                <select id="categoryFilter" class="w-full px-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-slate-500"></select>
+                <select id="sortOrder" class="w-full px-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-slate-500">
                     <option value="default">내가 정한 순서 (기본)</option>
                     <option value="composer">작곡가순</option>
-                    <option value="yearAsc">제작년도 가나다순</option>
+                    <option value="yearAsc">제작년도순</option>
                 </select>
             </div>
-            <div class="flex gap-2 justify-end">
-                <button id="btnShowAll" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg shadow-sm text-sm transition">전체 리스트 보기</button>
-                <button id="btnReset" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white font-medium rounded-lg shadow-sm text-sm transition">라이브러리 초기화</button>
-            </div>
+            <div class="flex gap-1.5 justify-end flex-wrap">
+                <button id="btnShowAll" class="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 text-gray-700 font-semibold rounded-lg text-xs transition">전체보기</button>
+                <button id="btnAddTrack" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition"><i class="fas fa-plus mr-1"></i>새로운 곡 추가</button>
+                </div>
         </section>
 
         <div id="loadingStatus" class="text-center py-12 text-gray-500 font-medium">
             <i class="fas fa-spinner fa-spin mr-2"></i> 로딩 중...
         </div>
         
-        <section id="libraryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+        <section id="libraryGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 hidden">
             </section>
     </main>
+
+    <div id="trackModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 hidden z-50">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-5">
+            <h2 id="modalTitle" class="text-lg font-bold text-gray-900 mb-4">곡 정보 수정</h2>
+            <input type="hidden" id="modalTrackId">
+            
+            <div class="space-y-3 mb-5">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">작품명</label>
+                    <input type="text" id="modalTitleInput" class="w-full px-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-slate-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">작곡가</label>
+                    <input type="text" id="modalComposerInput" class="w-full px-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-slate-500">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">작곡 연도 (숫자만)</label>
+                        <input type="number" id="modalYearInput" class="w-full px-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-slate-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">장르/분류</label>
+                        <input type="text" id="modalCategoryInput" class="w-full px-3 py-1.5 border border-gray-200 rounded-lg focus:outline-none focus:border-slate-500" placeholder="예: 협주곡, 독주곡">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center gap-2">
+                <a id="btnYoutube" target="_blank" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg text-xs transition flex items-center gap-1">
+                    <i class="fab fa-youtube"></i> 유튜브에서 연주 찾기
+                </a>
+                <div class="flex gap-1.5">
+                    <button id="btnCancelModal" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg text-xs transition">취소</button>
+                    <button id="btnSaveModal" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-950 text-white font-medium rounded-lg text-xs transition">저장하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // 1. [필수 변경] 사용자님의 실제 Firebase 설정 값 입력
+        // Firebase 프로젝트 설정
         const firebaseConfig = {
             apiKey: "AIzaSyC0vb9iYY8Rgt6TJelolyl0QECCjTYZJ0g",
             authDomain: "classiclibrary-64b1e.firebaseapp.com",
@@ -63,7 +101,7 @@
         const database = getDatabase(app);
         const dbRef = ref(database, "classic_library");
 
-        // 2. 105곡 원본 데이터 백업 구조 (0번은 인덱스 보정용 null 처리)
+        // 초기 데이터 백업 구조 (Firebase가 완전히 비어있을 때 최초 1회만 구동되는 백업 세트입니다)
         const initialTracks = [
             null,
             { id: 1, composer: "베토벤", title: "바이올린 협주곡 D장조", year: 1806, category: "협주곡" },
@@ -76,120 +114,117 @@
             { id: 8, composer: "모차르트", title: "Out of Africa 관련 곡", year: 1785, category: "협주곡" },
             { id: 9, composer: "바흐", title: "무반주 첼로 조곡", year: 1720, category: "독주곡" },
             { id: 10, composer: "바흐", title: "무반주 바이올린 파르티타 2번 샤콘느 BWV1004", year: 1720, category: "독주곡" },
-            { id: 11, composer: "비탈리", "title": "샤콘느", "year": 1705, "category": "독주곡" },
-            { id: 12, composer: "브루흐", "title": "바이올린 협주곡 1번", "year": 1866, "category": "협주곡" },
-            { id: 13, composer: "생상스", "title": "서주와 론도 카프리치오소", "year": 1863, "category": "독주곡" },
-            { id: 14, composer: "비발디", "title": "사계", "year": 1725, "category": "협주곡" },
-            { id: 15, composer: "라흐마니노프", "title": "보칼리제", "year": 1915, "category": "성악/오페라" },
-            { id: 16, composer: "파가니니", "title": "바이올린 협주곡 2번 '라 캄파넬라'", "year": 1826, "category": "협주곡" },
-            { id: 17, composer: "슈베르트", "title": "아르페지오네 소나타", "year": 1824, "category": "독주곡" },
-            { id: 18, composer: "빌라로보스", "title": "브라질풍의 바흐", "year": 1930, "category": "독주곡" },
-            { id: 19, composer: "하이든", "title": "첼로 협주곡 1번", "year": 1765, "category": "협주곡" },
-            { id: 20, composer: "헨델", "title": "파사칼리아", "year": 1693, "category": "독주곡" },
-            { id: 21, composer: "베르디", "title": "나부코 - 히브리 노예들의 합창", "year": 1841, "category": "성악/오페라" },
-            { id: 22, composer: "로드리고", "title": "아랑훼즈 협주곡", "year": 1939, "category": "협주곡" },
-            { id: 23, composer: "로드리고", "title": "안달루시아 협주곡", "year": 1954, "category": "협주곡" },
-            { id: 24, composer: "헨델", "title": "사라방드", "year": 1733, "category": "독주곡" },
-            { id: 25, composer: "모차르트", "title": "오보에 협주곡 K.314", "year": 1777, "category": "협주곡" },
-            { id: 26, composer: "바흐", "title": "토카타와 푸가 D단조 BWV565", "year": 1708, "category": "독주곡" },
-            { "id": 27, "composer": "모차르트", "title": "피아노 협주곡 23번", "year": 1786, "category": "협주곡" },
-            { "id": 28, "composer": "생상스", "title": "죽음의 무도", "year": 1874, "category": "교향곡" },
-            { "id": 29, "composer": "차이콥스키", "title": "바이올린 협주곡 Op.35", "year": 1878, "category": "협주곡" },
-            { "id": 30, "composer": "차이콥스키", "title": "교향곡 6번 '비창'", "year": 1893, "category": "교향곡" },
-            { "id": 31, "composer": "파겔벨", "title": "캐논", "year": 1680, "category": "독주곡" },
-            { "id": 32, "composer": "슈베르트", "title": "마왕", "year": 1815, "category": "성악/오페라" },
-            { "id": 33, "composer": "베토벤", "title": "교향곡 3번 '영웅'", "year": 1804, "category": "교향곡" },
-            { "id": 34, "composer": "베토벤", "title": "교향곡 5번 '운명'", "year": 1808, "category": "교향곡" },
-            { "id": 35, "composer": "베토벤", "title": "교향곡 6번 '전원'", "year": 1808, "category": "교향곡" },
-            { "id": 36, "composer": "베토벤", "title": "교향곡 9번 '합창'", "year": 1824, "category": "교향곡" },
-            { "id": 37, "composer": "하이든", "title": "첼로 협주곡 2번", "year": 1783, "category": "협주곡" },
-            { "id": 38, "composer": "베토벤", "title": "월광 소나타", "year": 1801, "category": "독주곡" },
-            { "id": 39, "composer": "모차르트", "title": "피아노 협주곡 20번", "year": 1785, "category": "협주곡" },
-            { "id": 40, "composer": "모차르트", "title": "피아노 협주곡 21번", "year": 1785, "category": "협주곡" },
-            { "id": 41, "composer": "리스트", "title": "탄식", "year": 1851, "category": "독주곡" },
-            { "id": 42, "composer": "슈베르트", "title": "현악4중주 '죽음과 소녀'", "year": 1824, "category": "독주곡" },
-            { "id": 43, "composer": "하이든", "title": "트럼펫 협주곡", "year": 1796, "category": "협주곡" },
-            { "id": 44, "composer": "라벨", "title": "볼레로", "year": 1928, "category": "교향곡" },
-            { "id": 45, "composer": "헨델", "title": "Ombra Mai Fu", "year": 1738, "category": "성악/오페라" },
-            { "id": 46, "composer": "쇼스타코비치", "title": "왈츠 2번", "year": 1956, "category": "교향곡" },
-            { "id": 47, "composer": "하이든", "title": "현악4중주 '종달새'", "year": 1790, "category": "독주곡" },
-            { "id": 48, "composer": "줄리아니", "title": "기타 협주곡", "year": 1808, "category": "협주곡" },
-            { "id": 49, "composer": "생상스", "title": "바이올린 협주곡 3번", "year": 1879, "category": "협주곡" },
-            { "id": 50, "composer": "피아졸라", "title": "대표 작품", "year": 1960, "category": "독주곡" },
-            { "id": 51, "composer": "쇼팽", "title": "발라드 1번", "year": 1835, "category": "독주곡" },
-            { "id": 52, "composer": "볼컴", "title": "우아한 유령 래그", "year": 1970, "category": "독주곡" },
-            { "id": 53, "composer": "라벨", "title": "물의 유희", "year": 1901, "category": "독주곡" },
-            { "id": 54, "composer": "브루흐", "title": "스코틀랜드 환상곡", "year": 1880, "category": "협주곡" },
-            { "id": 55, "composer": "슈베르트", "title": "피아노 3중주 D.929 2악장", "year": 1827, "category": "독주곡" },
-            { "id": 56, "composer": "모차르트", "title": "호른 협주곡 3번", "year": 1787, "category": "협주곡" },
-            { "id": 57, "composer": "거슈윈", "title": "랩소디 인 블루", "year": 1924, "category": "협주곡" },
-            { "id": 58, "composer": "바흐", "title": "골드베르크 변주곡", "year": 1741, "category": "독주곡" },
-            { "id": 59, "composer": "쇼팽", "title": "피아노 협주곡 2번", "year": 1830, "category": "협주곡" },
-            { "id": 60, "composer": "비제", "title": "아를르의 여인", "year": 1872, "category": "교향곡" },
-            { "id": 61, "composer": "드보르자크", "title": "교향곡 9번 '신세계'", "year": 1893, "category": "교향곡" },
-            { "id": 62, "composer": "리스트", "title": "헝가리 광시곡", "year": 1847, "category": "독주곡" },
-            { "id": 63, "composer": "알베니스", "title": "아스투리아스", "year": 1892, "category": "독주곡" },
-            { "id": 64, "composer": "모차르트", "title": "환상곡 K.397", "year": 1782, "category": "독주곡" },
-            { "id": 65, "composer": "바흐", "title": "시칠리아노 BWV1031", "year": 1730, "category": "독주곡" },
-            { "id": 66, "composer": "모차르트", "title": "피아노 소나타 12번 K.332", "year": 1783, "category": "독주곡" },
-            { "id": 67, "composer": "라벨", "title": "죽은 왕녀를 위한 파반느", "year": 1899, "category": "독주곡" },
-            { "id": 68, "composer": "포레", "title": "파반느 Op.50", "year": 1887, "category": "교향곡" },
-            { "id": 69, "composer": "멘델스존", "title": "핑갈의 동굴", "year": 1830, "category": "교향곡" },
-            { "id": 70, "composer": "드뷔시", "title": "목신의 오후 전주곡", "year": 1894, "category": "교향곡" },
-            { "id": 71, "composer": "드보르자크", "title": "슬라브 무곡", "year": 1878, "category": "교향곡" },
-            { "id": 72, "composer": "바그너", "title": "탄호이저 서곡", "year": 1845, "category": "성악/오페라" },
-            { "id": 73, "composer": "브람스", "title": "대학축전 서곡", "year": 1880, "category": "교향곡" },
-            { "id": 74, "composer": "모차르트", "title": "피가로의 결혼", "year": 1786, "category": "성악/오페라" },
-            { "id": 75, "composer": "베르디", "title": "오페라 작품들", "year": 1850, "category": "성악/오페라" },
-            { "id": 76, "composer": "번스타인", "title": "웨스트 사이드 스토리", "year": 1957, "category": "성악/오페라" },
-            { "id": 77, "composer": "프랑크", "title": "바이올린 소나타 A장조", "year": 1886, "category": "독주곡" },
-            { "id": 78, "composer": "그리그", "title": "페르귄트 모음곡", "year": 1875, "category": "교향곡" },
-            { "id": 79, "composer": "거슈윈", "title": "포기와 베스 - Summertime", "year": 1935, "category": "성악/오페라" },
-            { "id": 80, "composer": "베토벤", "title": "발트슈타인 소나타", "year": 1804, "category": "독주곡" },
-            { "id": 81, "composer": "비발디", "title": "세상에 참 평화없어라", "year": 1725, "category": "성악/오페라" },
-            { "id": 82, "composer": "칼 젠킨스", "title": "팔라디오", "year": 1995, "category": "교향곡" },
-            { "id": 83, "composer": "바흐", "title": "바이올린 협주곡 1번", "year": 1730, "category": "협주곡" },
-            { "id": 84, "composer": "바흐", "title": "바이올린과 오보에를 위한 협주곡", "year": 1730, "category": "협주곡" },
-            { "id": 85, "composer": "라흐마니노프", "title": "피아노 협주곡 2번", "year": 1901, "category": "협주곡" },
-            { "id": 86, "composer": "라흐마니노프", "title": "피아노 협주곡 3번", "year": 1909, "category": "협주곡" },
-            { "id": 87, "composer": "라흐마니노프", "title": "교향곡 2번", "year": 1907, "category": "교향곡" },
-            { "id": 88, "composer": "마르첼로", "title": "오보에 협주곡 D단조", "year": 1717, "category": "협주곡" },
-            { "id": 89, "composer": "벨리니", "title": "노르마", "year": 1831, "category": "성악/오페라" },
-            { "id": 90, "composer": "비발디", "title": "두 대의 트럼펫을 위한 협주곡", "year": 1720, "category": "협주곡" },
-            { "id": 91, "composer": "파가니니", "title": "바이올린과 기타를 위한 소나타", "year": 1803, "category": "독주곡" },
-            { "id": 92, "composer": "헨델", "title": "울게 하소서", "year": 1711, "category": "성악/오페라" },
-            { "id": 93, "composer": "베토벤", "title": "비창 소나타", "year": 1798, "category": "독주곡" },
-            { "id": 94, "composer": "로시니", "title": "윌리엄 텔 서곡", "year": 1829, "category": "성악/오페라" },
-            { "id": 95, "composer": "로드리고", "title": "어느 귀인을 위한 환상곡", "year": 1954, "category": "협주곡" },
-            { "id": 96, "composer": "베토벤", "title": "교향곡 7번", "year": 1812, "category": "교향곡" },
-            { "id": 97, "composer": "바버", "title": "현을 위한 아다지오 Op.11", "year": 1936, "category": "교향곡" },
-            { "id": 98, "composer": "피아졸라", "title": "오블리비온", "year": 1982, "category": "독주곡" },
-            { "id": 99, "composer": "피아졸라", "title": "리베르탱고", "year": 1974, "category": "독주곡" },
-            { "id": 100, "composer": "모차르트", "title": "피가로의 결혼 중 편지의 이중창", "year": 1786, "category": "성악/오페라" },
-            { "id": 101, "composer": "모차르트", "title": "돈 조반니", "year": 1787, "category": "성악/오페라" },
-            { "id": 102, "composer": "모차르트", "title": "마술피리", "year": 1791, "category": "성악/오페라" },
-            { "id": 103, "composer": "로시니", "title": "세비야의 이발사", "year": 1816, "category": "성악/오페라" },
-            { "id": 104, "composer": "하이든", "title": "현악4중주 '황제'", "year": 1797, "category": "독주곡" },
-            { "id": 105, "composer": "루치오 달라", "title": "카루소", "year": 1986, "category": "성악/오페라" }
+            { id: 11, composer: "비탈리", title: "샤콘느", year: 1705, category: "독주곡" },
+            { id: 12, composer: "브루흐", title: "바이올린 협주곡 1번", year: 1866, category: "협주곡" },
+            { id: 13, composer: "생상스", title: "서주와 론도 카프리치오소", year: 1863, category: "독주곡" },
+            { id: 14, composer: "비발디", title: "사계", year: 1725, category: "협주곡" },
+            { id: 15, composer: "라흐마니노프", title: "보칼리제", year: 1915, category: "성악/오페라" },
+            { id: 16, composer: "파가니니", title: "바이올린 협주곡 2번 '라 캄파넬라'", year: 1826, category: "협주곡" },
+            { id: 17, composer: "슈베르트", title: "아르페지오네 소나타", year: 1824, category: "독주곡" },
+            { id: 18, composer: "빌라로보스", title: "브라질풍의 바흐", year: 1930, category: "독주곡" },
+            { id: 19, composer: "하이든", title: "첼로 협주곡 1번", year: 1765, category: "협주곡" },
+            { id: 20, composer: "헨델", title: "파사칼리아", year: 1693, category: "독주곡" },
+            { id: 21, composer: "베르디", title: "나부코 - 히브리 노예들의 합창", year: 1841, category: "성악/오페라" },
+            { id: 22, composer: "로드리고", title: "아랑훼즈 협주곡", year: 1939, category: "협주곡" },
+            { id: 23, composer: "로드리고", title: "안달루시아 협주곡", year: 1954, category: "협주곡" },
+            { id: 24, composer: "헨델", title: "사라방드", year: 1733, category: "독주곡" },
+            { id: 25, composer: "모차르트", title: "오보에 협주곡 K.314", year: 1777, category: "협주곡" },
+            { id: 26, composer: "바흐", title: "토카타와 푸가 D단조 BWV565", year: 1708, category: "독주곡" },
+            { id: 27, composer: "모차르트", title: "피아노 협주곡 23번", year: 1786, category: "협주곡" },
+            { id: 28, composer: "생상스", title: "죽음의 무도", year: 1874, category: "교향곡" },
+            { id: 29, composer: "차이콥스키", title: "바이올린 협주곡 Op.35", year: 1878, category: "협주곡" },
+            { id: 30, composer: "차이콥스키", title: "교향곡 6번 '비창'", year: 1893, category: "교향곡" },
+            { id: 31, composer: "파겔벨", title: "캐논", year: 1680, category: "독주곡" },
+            { id: 32, composer: "슈베르트", title: "마왕", year: 1815, category: "성악/오페라" },
+            { id: 33, composer: "베토벤", title: "교향곡 3번 '영웅'", year: 1804, category: "교향곡" },
+            { id: 34, composer: "베토벤", title: "교향곡 5번 '운명'", year: 1808, category: "교향곡" },
+            { id: 35, composer: "베토벤", title: "교향곡 6번 '전원'", year: 1808, category: "교향곡" },
+            { id: 36, composer: "베토벤", title: "교향곡 9번 '합창'", year: 1824, category: "교향곡" },
+            { id: 37, composer: "하이든", title: "첼로 협주곡 2번", year: 1783, category: "협주곡" },
+            { id: 38, composer: "베토벤", title: "월광 소나타", year: 1801, category: "독주곡" },
+            { id: 39, composer: "모차르트", title: "피아노 협주곡 20번", year: 1785, category: "협주곡" },
+            { id: 40, composer: "모차르트", title: "피아노 협주곡 21번", year: 1785, category: "협주곡" },
+            { id: 41, composer: "리스트", title: "탄식", year: 1851, category: "독주곡" },
+            { id: 42, composer: "슈베르트", title: "현악4중주 '죽음과 소녀'", year: 1824, category: "독주곡" },
+            { id: 43, composer: "하이든", title: "트럼펫 협주곡", year: 1796, category: "협주곡" },
+            { id: 44, composer: "라벨", title: "볼레로", year: 1928, category: "교향곡" },
+            { id: 45, composer: "헨델", title: "Ombra Mai Fu", year: 1738, category: "성악/오페라" },
+            { id: 46, composer: "쇼스타코비치", title: "왈츠 2번", year: 1956, category: "교향곡" },
+            { id: 47, composer: "하이든", title: "현악4중주 '종달새'", year: 1790, category: "독주곡" },
+            { id: 48, composer: "줄리아니", title: "기타 협주곡", year: 1808, category: "협주곡" },
+            { id: 49, composer: "생상스", title: "바이올린 협주곡 3번", year: 1879, category: "협주곡" },
+            { id: 50, composer: "피아졸라", title: "대표 작품", year: 1960, category: "독주곡" },
+            { id: 51, composer: "쇼팽", title: "발라드 1번", year: 1835, category: "독주곡" },
+            { id: 52, composer: "볼컴", title: "우아한 유령 래그", year: 1970, category: "독주곡" },
+            { id: 53, composer: "라벨", title: "물의 유희", year: 1901, category: "독주곡" },
+            { id: 54, composer: "브루흐", title: "스코틀랜드 환상곡", year: 1880, category: "협주곡" },
+            { id: 55, composer: "슈베르트", title: "피아노 3중주 D.929 2악장", year: 1827, category: "독주곡" },
+            { id: 56, composer: "모차르트", title: "호른 협주곡 3번", year: 1787, category: "협주곡" },
+            { id: 57, composer: "거슈윈", title: "랩소디 인 블루", year: 1924, category: "협주곡" },
+            { id: 58, composer: "바흐", title: "골드베르크 변주곡", year: 1741, category: "독주곡" },
+            { id: 59, composer: "쇼팽", title: "피아노 협주곡 2번", year: 1830, category: "협주곡" },
+            { id: 60, composer: "비제", "title": "아를르의 여인", "year": 1872, "category": "교향곡" },
+            { id: 61, composer: "드보르자크", "title": "교향곡 9번 '신세계'", "year": 1893, "category": "교향곡" },
+            { id: 62, composer: "리스트", "title": "헝가리 광시곡", "year": 1847, "category": "독주곡" },
+            { id: 63, composer: "알베니스", "title": "아스투리아스", "year": 1892, "category": "독주곡" },
+            { id: 64, composer: "모차르트", "title": "환상곡 K.397", "year": 1782, "category": "독주곡" },
+            { id: 65, composer: "바흐", "title": "시칠리아노 BWV1031", "year": 1730, "category": "독주곡" },
+            { id: 66, composer: "모차르트", "title": "피아노 소나타 12번 K.332", "year": 1783, "category": "독주곡" },
+            { id: 67, composer: "라벨", "title": "죽은 왕녀를 위한 파반느", "year": 1899, "category": "독주곡" },
+            { id: 68, composer: "포레", "title": "파반느 Op.50", "year": 1887, "category": "교향곡" },
+            { id: 69, composer: "멘델스존", "title": "핑갈의 동굴", "year": 1830, "category": "교향곡" },
+            { id: 70, composer: "드뷔시", "title": "목신의 오후 전주곡", "year": 1894, "category": "교향곡" },
+            { id: 71, composer: "드보르자크", "title": "슬라브 무곡", "year": 1878, "category": "교향곡" },
+            { id: 72, composer: "바그너", "title": "탄호이저 서곡", "year": 1845, "category": "성악/오페라" },
+            { id: 73, composer: "브람스", "title": "대학축전 서곡", "year": 1880, "category": "교향곡" },
+            { id: 74, composer: "모차르트", "title": "피가로의 결혼", "year": 1786, "category": "성악/오페라" },
+            { id: 75, composer: "베르디", "title": "오페라 작품들", "year": 1850, "category": "성악/오페라" },
+            { id: 76, composer: "번스타인", "title": "웨스트 사이드 스토리", "year": 1957, "category": "성악/오페라" },
+            { id: 77, composer: "프랑크", "title": "바이올린 소나타 A장조", "year": 1886, "category": "독주곡" },
+            { id: 78, composer: "그리그", "title": "페르귄트 모음곡", "year": 1875, "category": "교향곡" },
+            { id: 79, composer: "거슈윈", "title": "포기와 베스 - Summertime", "year": 1935, "category": "성악/오페라" },
+            { id: 80, composer: "베토벤", "title": "발트슈타인 소나타", "year": 1804, "category": "독주곡" },
+            { id: 81, composer: "비발디", "title": "세상에 참 평화없어라", "year": 1725, "category": "성악/오페라" },
+            { id: 82, composer: "칼 젠킨스", "title": "팔라디오", "year": 1995, "category": "교향곡" },
+            { id: 83, composer: "바흐", "title": "바이올린 협주곡 1번", "year": 1730, "category": "협주곡" },
+            { id: 84, composer: "바흐", "title": "바이올린과 오보에를 위한 협주곡", "year": 1730, "category": "협주곡" },
+            { id: 85, composer: "라흐마니노프", "title": "피아노 협주곡 2번", "year": 1901, "category": "협주곡" },
+            { id: 86, composer: "라흐마니노프", "title": "피아노 협주곡 3번", "year": 1909, "category": "협주곡" },
+            { id: 87, composer: "라흐마니노프", "title": "교향곡 2번", "year": 1907, "category": "교향곡" },
+            { id: 88, composer: "마르첼로", "title": "오보에 협주곡 D단조", "year": 1717, "category": "협주곡" },
+            { id: 89, composer: "벨리니", "title": "노르마", "year": 1831, "category": "성악/오페라" },
+            { id: 90, composer: "비발디", "title": "두 대의 트럼펫을 위한 협주곡", "year": 1720, "category": "협주곡" },
+            { id: 91, composer: "파가니니", "title": "바이올린과 기타를 위한 소나타", "year": 1803, "category": "독주곡" },
+            { id: 92, composer: "헨델", "title": "울게 하소서", "year": 1711, "category": "성악/오페라" },
+            { id: 93, composer: "베토벤", "title": "비창 소나타", "year": 1798, "category": "독주곡" },
+            { id: 94, composer: "로시니", "title": "윌리엄 텔 서곡", "year": 1829, "category": "성악/오페라" },
+            { id: 95, composer: "로드리고", "title": "어느 귀인을 위한 환상곡", "year": 1954, "category": "협주곡" },
+            { id: 96, composer: "베토벤", "title": "교향곡 7번", "year": 1812, "category": "교향곡" },
+            { id: 97, composer: "바버", "title": "현을 위한 아다지오 Op.11", "year": 1936, "category": "교향곡" },
+            { id: 98, composer: "피아졸라", "title": "오블리비온", "year": 1982, "category": "독주곡" },
+            { id: 99, composer: "피아졸라", "title": "리베르탱고", "year": 1974, "category": "독주곡" },
+            { id: 100, composer: "모차르트", "title": "피가로의 결혼 중 편지의 이중창", "year": 1786, "category": "성악/오페라" },
+            { id: 101, composer: "모차르트", "title": "돈 조반니", "year": 1787, "category": "성악/오페라" },
+            { id: 102, composer: "모차르트", "title": "마술피리", "year": 1791, "category": "성악/오페라" },
+            { id: 103, composer: "로시니", "title": "세비야의 이발사", "year": 1816, "category": "성악/오페라" },
+            { id: 104, composer: "하이든", "title": "현악4중주 '황제'", "year": 1797, "category": "독주곡" },
+            { id: 105, composer: "루치오 달라", "title": "카루소", "year": 1986, "category": "성악/오페라" }
         ];
 
         let tracks = [];
 
-        // 3. Firebase 실시간 동기화 (오류 차단 안전 모드)
+        // Firebase 수신 데이터베이스 감시
         onValue(dbRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                // 파이어베이스에 데이터가 있다면 즉시 동기화
                 tracks = data;
             } else {
-                // 비어 있다면 로컬 데이터 주입
                 tracks = JSON.parse(JSON.stringify(initialTracks));
                 set(dbRef, tracks);
             }
             initApp();
         });
 
-        // 4. 애플리케이션 UI 초기화 및 구동
         function initApp() {
             document.getElementById('loadingStatus').classList.add('hidden');
             document.getElementById('libraryGrid').classList.remove('hidden');
@@ -197,7 +232,6 @@
             render();
         }
 
-        // 카테고리 필터 옵션 채우기
         function initFilters() {
             const categories = new Set(['전체 장르']);
             tracks.forEach(t => { if(t && t.category) categories.add(t.category); });
@@ -215,78 +249,4 @@
             });
         }
 
-        // 리스트 화면 렌더링 함수
-        function render() {
-            const grid = document.getElementById('libraryGrid');
-            const searchKeyword = document.getElementById('searchInput').value.toLowerCase();
-            const selectedCategory = document.getElementById('categoryFilter').value || '전체 장르';
-            const sortOrder = document.getElementById('sortOrder').value;
-
-            grid.innerHTML = '';
-
-            // null 제거 후 가공용 배열 생성
-            let filtered = tracks.filter(t => t !== null);
-
-            // 검색어 필터링
-            if (searchKeyword) {
-                filtered = filtered.filter(t => 
-                    t.composer.toLowerCase().includes(searchKeyword) || 
-                    t.title.toLowerCase().includes(searchKeyword)
-                );
-            }
-
-            // 카테고리 필터링
-            if (selectedCategory !== '전체 장르') {
-                filtered = filtered.filter(t => t.category === selectedCategory);
-            }
-
-            // 정렬 처리
-            if (sortOrder === 'composer') {
-                filtered.sort((a, b) => a.composer.localeCompare(b.composer, 'ko'));
-            } else if (sortOrder === 'yearAsc') {
-                filtered.sort((a, b) => a.year - b.year);
-            } else {
-                filtered.sort((a, b) => a.id - b.id);
-            }
-
-            // 카드 생성 및 주입
-            filtered.forEach(track => {
-                const card = document.createElement('div');
-                card.className = "card bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between";
-                card.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded">No.${track.id}</span>
-                            <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-1 rounded">${track.category}</span>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-900 mb-1">${track.title}</h3>
-                        <p class="text-sm text-gray-600 mb-4">${track.composer}</p>
-                    </div>
-                    <div class="text-right text-xs text-gray-400 font-light border-t border-gray-50 pt-3">
-                        ${track.year}년 작
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
-
-        // 이벤트 리스너 바인딩
-        document.getElementById('searchInput').addEventListener('input', render);
-        document.getElementById('categoryFilter').addEventListener('change', render);
-        document.getElementById('sortOrder').addEventListener('change', render);
-        
-        document.getElementById('btnShowAll').addEventListener('click', () => {
-            document.getElementById('searchInput').value = '';
-            document.getElementById('categoryFilter').value = '전체 장르';
-            document.getElementById('sortOrder').value = 'default';
-            render();
-        });
-
-        document.getElementById('btnReset').addEventListener('click', () => {
-            if (confirm("모든 데이터와 정렬 순서를 처음 상태로 복구할까요?")) {
-                set(dbRef, initialTracks);
-            }
-        });
-    </script>
-</body>
-</html>
+        // 컴
