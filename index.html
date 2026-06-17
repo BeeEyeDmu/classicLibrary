@@ -282,24 +282,27 @@
         let currentPassword = ""; 
         let activeSearchKeyword = ""; 
 
-        // 데이터 로드 및 초기 배치 제어
+        // 데이터 로드 및 초기 배치 제어 (예외 처리 및 강제 동기화 보강)
         onValue(dbRef, (snapshot) => {
             try {
                 const data = snapshot.val();
-                if (data && Object.keys(data).length > 1) {
+                
+                // 데이터가 제대로 존재하고 형식이 맞는지 정밀 검사
+                if (data && (Array.isArray(data) ? data.length > 50 : Object.keys(data).length > 50)) {
                     tracks = Array.isArray(data) ? data : Object.values(data);
                 } else {
-                    console.log("파이어베이스 공간이 비어 있어 초기 리스트 105곡을 서버로 동기화합니다.");
+                    console.log("파이어베이스 공간이 비어있거나 데이터가 올바르지 않아 초기 105곡을 강제 동기화합니다.");
                     tracks = initialTracks;
                     set(dbRef, initialTracks); 
                 }
             } catch (e) {
-                console.error(e);
+                console.error("데이터 로딩 중 에러 발생, 기본 데이터로 대체합니다:", e);
+                tracks = initialTracks;
             } finally {
                 initApp();
             }
         });
-
+        
         function initApp() {
             document.getElementById('loadingStatus').style.display = 'none';
             document.getElementById('libraryGrid').classList.remove('hidden');
