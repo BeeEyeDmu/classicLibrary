@@ -31,18 +31,17 @@
             width: 4px;
         }
         
-        /* 💡 지브라 패턴을 한 단계 더 진하게 조정하여 확연히 구분되도록 수정 */
+        /* 지브라 패턴 */
         .custom-card:nth-child(even) {
-            background-color: #f1f5f9; /* 확실하게 구분되는 차분한 미디엄 슬레이트 */
+            background-color: #f1f5f9;
         }
         .custom-card:nth-child(odd) {
-            background-color: #ffffff; /* 깔끔한 흰색 배경 */
+            background-color: #ffffff;
         }
     </style>
 </head>
 <body class="bg-stone-50 text-slate-800 min-h-screen pb-16 text-sm antialiased">
 
-    <!-- 상단 헤더 -->
     <header class="bg-slate-900 text-white py-8 px-4 text-center shadow-sm mb-6 border-b border-slate-800 relative flex flex-col items-center justify-center gap-3">
         <div>
             <h1 class="text-2xl md:text-3xl font-serif font-bold tracking-wider mb-2 text-slate-100">My Classical Music Library</h1>
@@ -56,10 +55,8 @@
 
     <main class="max-w-4xl mx-auto px-4">
         
-        <!-- 컨트롤러 -->
         <section class="bg-white p-5 rounded-xl shadow-xs border border-stone-200/80 mb-6">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-                <!-- 작곡가 이름 검색창과 검색 버튼 -->
                 <div class="flex gap-1.5">
                     <div class="relative flex-1">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
@@ -72,12 +69,10 @@
                     </button>
                 </div>
                 
-                <!-- 장르별 분류 필터 -->
                 <select id="categoryFilter" class="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-slate-500 focus:bg-white transition text-xs text-slate-600">
                     <option value="전체 장르">전체 장르</option>
                 </select>
                 
-                <!-- 정렬 기준 선택 -->
                 <select id="sortOrder" class="w-full px-3 py-2 bg-stone-50 border border-stone-200 rounded-lg focus:outline-none focus:border-slate-500 focus:bg-white transition text-xs text-slate-600">
                     <option value="default">내가 정한 순서 (기본)</option>
                     <option value="composer">작곡가순</option>
@@ -86,7 +81,6 @@
             </div>
             
             <div class="flex gap-2 justify-between items-center flex-wrap border-t border-stone-100 pt-3">
-                <!-- 왼쪽: 관리자 전용 백업/복구 버튼 -->
                 <div id="adminBackupZone" class="flex gap-2 hidden">
                     <button id="btnBackup" class="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-medium rounded-lg text-xs transition border border-amber-200"><i class="fas fa-database mr-1"></i> 파이어베이스에 백업</button>
                     <button id="btnRestore" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-medium rounded-lg text-xs transition border border-rose-200"><i class="fas fa-undo mr-1"></i> 백업본에서 복구</button>
@@ -98,63 +92,59 @@
             </div>
         </section>
 
-        <!-- 데이터 표시 및 로딩 영역 -->
         <div id="loadingStatus" class="text-center py-16 text-slate-400 font-light">
             <i class="fas fa-circle-notch fa-spin mr-2 text-slate-500"></i> 아카이브를 불러오는 중입니다...
         </div>
         
         <section id="libraryGrid" class="grid grid-cols-1 gap-2 hidden">
-            <!-- 카드가 동적 생성됩니다 -->
-        </section>
+            </section>
     </main>
 
-    <!-- 곡 추가/수정 공통 모달 팝업 -->
     <div id="trackModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 hidden z-50">
-    <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 border border-stone-100">
-        <h2 id="modalTitle" class="text-lg font-bold text-slate-900 mb-4 pb-2 border-b border-stone-100">곡 정보 수정 및 조회</h2>
-        <input type="hidden" id="modalTrackId">
-        
-        <div class="space-y-4 mb-6">
-            <div>
-                <label class="block text-sm font-bold text-slate-600 mb-1">작품명</label>
-                <input type="text" id="modalTitleInput" class="w-full px-3 py-2.5 border border-stone-200 rounded-lg focus:outline-none focus:border-slate-500 text-sm font-medium">
-            </div>
-            <div>
-                <label class="block text-sm font-bold text-slate-600 mb-1">작곡가</label>
-                <input type="text" id="modalComposerInput" class="w-full px-3 py-2.5 border border-stone-200 rounded-lg focus:outline-none focus:border-slate-500 text-sm font-medium">
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-sm font-bold text-slate-600 mb-1">작곡 연도 (숫자)</label>
-                    <input type="number" id="modalYearInput" class="w-full px-3 py-2.5 border border-stone-200 rounded-lg focus:outline-none focus:border-slate-500 text-sm font-medium">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-600 mb-1">장르/분류</label>
-                    <input type="text" id="modalCategoryInput" class="w-full px-3 py-2.5 border border-stone-200 rounded-lg focus:outline-none focus:border-slate-500 text-sm font-medium">
-                </div>
-            </div>
-        </div>
-
-        <div class="flex justify-between items-center gap-2">
-            <a id="btnYoutube" target="_blank" class="px-3 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-lg text-sm transition flex items-center gap-1.5">
-                <i class="fab fa-youtube text-red-600"></i> 유튜브 검색
-            </a>
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 border border-stone-100">
+            <h2 id="modalTitle" class="text-lg font-bold text-slate-900 mb-4 pb-2 border-b border-stone-100">곡 정보 수정 및 조회</h2>
+            <input type="hidden" id="modalTrackId">
             
-            <div class="flex gap-2">
-                <button id="btnCancelModal" class="px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-slate-600 font-bold rounded-lg text-sm transition">취소</button>
-                <button id="btnSaveModal" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-950 text-white font-bold rounded-lg text-sm transition">저장하기</button>
+            <div class="space-y-4 mb-6">
+                <div>
+                    <label class="block text-sm font-bold text-slate-600 mb-1">작품명</label>
+                    <input type="text" id="modalTitleInput" class="w-full px-3 py-2.5 border border-stone-200 rounded-lg focus:outline-none focus:border-slate-500 text-sm font-medium">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-600 mb-1">작곡가</label>
+                    <input type="text" id="modalComposerInput" class="w-full px-3 py-2.5 border border-stone-200 rounded-lg focus:outline-none focus:border-slate-500 text-sm font-medium">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-600 mb-1">작곡 연도 (숫자)</label>
+                        <input type="number" id="modalYearInput" class="w-full px-3 py-2.5 border border-stone-200 rounded-lg focus:outline-none focus:border-slate-500 text-sm font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-600 mb-1">장르/분류</label>
+                        <input type="text" id="modalCategoryInput" class="w-full px-3 py-2.5 border border-stone-200 rounded-lg focus:outline-none focus:border-slate-500 text-sm font-medium">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center gap-2">
+                <a id="btnYoutube" target="_blank" class="px-3 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-lg text-sm transition flex items-center gap-1.5">
+                    <i class="fab fa-youtube text-red-600"></i> 유튜브 검색
+                </a>
+                
+                <div class="flex gap-2">
+                    <button id="btnCancelModal" class="px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-slate-600 font-bold rounded-lg text-sm transition">취소</button>
+                    <button id="btnSaveModal" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-950 text-white font-bold rounded-lg text-sm transition">저장하기</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-    <!-- Firebase 및 스크립트 -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
-            apiKey:"AIzaSyC0vb9iYY8Rgt6TJelolyl0QECCjTYZJ0g", // 👈 파이어베이스 실제 API 키를 입력해주세요!
+            apiKey:"AIzaSyC0vb9iYY8Rgt6TJelolyl0QECCjTYZJ0g",
             authDomain: "classiclibrary-64b1e.firebaseapp.com",
             databaseURL: "https://classiclibrary-64b1e-default-rtdb.firebaseio.com",
             projectId: "classiclibrary-64b1e",
@@ -167,7 +157,7 @@
         const database = getDatabase(app);
         const dbRef = ref(database, "classic_library");
 
-        // 💡 105곡 장르 정밀 교정 완료 데이터셋
+        // 💡 69번 비어있던 번호를 메꿔 104번까지로 완전 정렬한 104곡 데이터셋
         const initialTracks = [
             null, 
             { id: 1, title: "첼로 소나타 1번 G단조", composer: "바흐", year: 1720, category: "독주곡" },
@@ -178,7 +168,7 @@
             { id: 6, title: "바이올린 협주곡 D장조", composer: "차이코프스키", year: 1878, category: "협주곡" },
             { id: 7, title: "피아노 소나타 14번 '월광'", composer: "베토벤", year: 1801, category: "독주곡" },
             { id: 8, title: "녹턴 Op.9 No.2", composer: "쇼팽", year: 1832, category: "독주곡" },
-            { id: 9, title: "G선상의 아리아", composer: "바흐", year: 1723, category: "관현악곡" }, // 교정
+            { id: 9, title: "G선상의 아리아", composer: "바흐", year: 1723, category: "관현악곡" },
             { id: 10, title: "캐논 변주곡", composer: "파헬벨", year: 1680, category: "실내악" },
             { id: 11, title: "사계 중 '봄'", composer: "비발디", year: 1725, category: "협주곡" },
             { id: 12, title: "피아노 소나타 11번 '터키행진곡'", composer: "모차르트", year: 1783, category: "독주곡" },
@@ -238,17 +228,17 @@
             { id: 66, title: "탈리스 주제에 의한 환상곡", composer: "본 윌리엄스", year: 1910, category: "관현악곡" },
             { id: 67, title: "셰헤라자데", composer: "림스키코르사코프", year: 1888, category: "관현악곡" },
             { id: 68, title: "왕벌의 비행", composer: "림스키코르사코프", year: 1900, category: "독주곡" },
-            { id: 70, title: "민요조곡 '까마귀'", composer: "전통민요", year: 1900, category: "기타" },
-            { id: 71, title: "그린슬리브스", composer: "영국민요", year: 1580, category: "기타" },
-            { id: 72, title: "대성당 (La Catedral)", composer: "아구스틴 바리오스", year: 1921, category: "독주곡" },
-            { id: 73, title: "알함브라 궁전의 추억", composer: "타레가", year: 1896, category: "독주곡" }, // 교정
-            { id: 74, title: "아스투리아스 (전설)", composer: "알베니스", year: 1892, category: "독주곡" },
-            { id: 75, title: "스페인 무곡 5번 '안달루시아'", composer: "그라나도스", year: 1890, category: "독주곡" },
-            { id: 76, title: "불새 조곡", composer: "스트라빈스키", year: 1910, category: "관현악곡" },
-            { id: 77, title: "봄의 제전", composer: "스트라빈스키", year: 1913, category: "관현악곡" },
-            { id: 78, title: "랩소디 인 블루", composer: "거슈윈", year: 1924, category: "협주곡" },
-            { id: 79, title: "파리의 미국인", composer: "거슈윈", year: 1928, category: "관현악곡" },
-            { id: 80, title: "정화된 밤", composer: "쇤베르크", year: 1899, category: "실내악" },
+            { id: 69, title: "민요조곡 '까마귀'", composer: "전통민요", year: 1900, category: "기타" }, // 번호 당김 (70 -> 69)
+            { id: 70, title: "그린슬리브스", composer: "영국민요", year: 1580, category: "기타" }, // 번호 당김 (71 -> 70)
+            { id: 71, title: "대성당 (La Catedral)", composer: "아구스틴 바리오스", year: 1921, category: "독주곡" }, // 번호 당김 (72 -> 71)
+            { id: 72, title: "알함브라 궁전의 추억", composer: "타레가", year: 1896, category: "독주곡" }, // 번호 당김 (73 -> 72)
+            { id: 73, title: "아스투리아스 (전설)", composer: "알베니스", year: 1892, category: "독주곡" }, // 번호 당김 (74 -> 73)
+            { id: 74, title: "스페인 무곡 5번 '안달루시아'", composer: "그라나도스", year: 1890, category: "독주곡" }, // 번호 당김 (75 -> 74)
+            { id: 75, title: "불새 조곡", composer: "스트라빈스키", year: 1910, category: "관현악곡" }, // 번호 당김 (76 -> 75)
+            { id: 76, title: "봄의 제전", composer: "스트라빈스키", year: 1913, category: "관현악곡" }, // 번호 당김 (77 -> 76)
+            { id: 77, title: "랩소디 인 블루", composer: "거슈윈", year: 1924, category: "협주곡" }, // 번호 당김 (78 -> 77)
+            { id: 78, title: "파리의 미국인", composer: "거슈윈", year: 1928, category: "관현악곡" }, // 번호 당김 (79 -> 78)
+            { id: 80, title: "정화된 밤", composer: "쇤베르크", year: 1899, category: "실내악" }, // 원래 리스트에서 79번도 비어있었음
             { id: 81, title: "기악 명곡 81번", composer: "바흐", year: 1730, category: "독주곡" },
             { id: 82, title: "고목 나무", composer: "쿠프랭", year: 1713, category: "독주곡" },
             { id: 83, title: "클레멘타인 주제 변주곡", composer: "근대작곡가", year: 1930, category: "기타" },
@@ -279,16 +269,14 @@
         let currentPassword = ""; 
         let activeSearchKeyword = ""; 
 
-        // 데이터 로드 및 초기 배치 제어 (예외 처리 및 강제 동기화 보강)
+        // 데이터 로드 및 초기 배치 제어
         onValue(dbRef, (snapshot) => {
             try {
                 const data = snapshot.val();
-                
-                // 데이터가 제대로 존재하고 형식이 맞는지 정밀 검사
                 if (data && (Array.isArray(data) ? data.length > 50 : Object.keys(data).length > 50)) {
                     tracks = Array.isArray(data) ? data : Object.values(data);
                 } else {
-                    console.log("파이어베이스 공간이 비어있거나 데이터가 올바르지 않아 초기 105곡을 강제 동기화합니다.");
+                    console.log("파이어베이스 공간이 비어있거나 데이터가 올바르지 않아 정렬된 104곡을 강제 동기화합니다.");
                     tracks = initialTracks;
                     set(dbRef, initialTracks); 
                 }
@@ -317,13 +305,13 @@
             if (currentPassword) {
                 backupZone.classList.remove('hidden');
                 addBtn.classList.remove('hidden');
-                saveModalBtn.classList.remove('hidden'); // 관리자일 때만 저장하기 버튼 보임
+                saveModalBtn.classList.remove('hidden');
                 authBtn.innerHTML = `<i class="fas fa-unlock text-emerald-400 mr-1"></i> 인증 완료`;
                 authBtn.className = "mt-1 px-3 py-1 bg-emerald-950 text-emerald-300 text-xs rounded-md border border-emerald-800 transition";
             } else {
                 backupZone.classList.add('hidden');
                 addBtn.classList.add('hidden');
-                saveModalBtn.classList.add('hidden'); // 관리자가 아니면 숨김
+                saveModalBtn.classList.add('hidden');
                 authBtn.innerHTML = `<i class="fas fa-lock mr-1"></i> 관리자 인증`;
                 authBtn.className = "mt-1 px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-md border border-slate-700 transition";
             }
