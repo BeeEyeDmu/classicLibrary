@@ -33,14 +33,14 @@
         
         /* 지브라 패턴 */
         .custom-card:nth-child(even) {
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
         }
         .custom-card:nth-child(odd) {
             background-color: #ffffff;
         }
     </style>
 </head>
-<body class="bg-stone-50 text-slate-800 min-h-screen pb-16 text-sm antialiased">
+<body class="bg-stone-100 text-slate-800 min-h-screen pb-16 text-sm antialiased">
 
     <header class="bg-slate-900 text-white py-8 px-4 text-center shadow-sm mb-6 border-b border-slate-800 relative flex flex-col items-center justify-center gap-3">
         <div>
@@ -157,7 +157,7 @@
         const database = getDatabase(app);
         const dbRef = ref(database, "classic_library");
 
-        // 💡 69번 비어있던 번호를 메꿔 104번까지로 완전 정렬한 104곡 데이터셋
+        // 초기 데이터 리스트 (오류 완벽 수정 버전)
         const initialTracks = [
             null, 
             { id: 1, title: "첼로 소나타 1번 G단조", composer: "바흐", year: 1720, category: "독주곡" },
@@ -228,60 +228,58 @@
             { id: 66, title: "탈리스 주제에 의한 환상곡", composer: "본 윌리엄스", year: 1910, category: "관현악곡" },
             { id: 67, title: "셰헤라자데", composer: "림스키코르사코프", year: 1888, category: "관현악곡" },
             { id: 68, title: "왕벌의 비행", composer: "림스키코르사코프", year: 1900, category: "독주곡" },
-            { id: 69, title: "민요조곡 '까마귀'", composer: "전통민요", year: 1900, category: "기타" }, // 번호 당김 (70 -> 69)
-            { id: 70, title: "그린슬리브스", composer: "영국민요", year: 1580, category: "기타" }, // 번호 당김 (71 -> 70)
-            { id: 71, title: "대성당 (La Catedral)", composer: "아구스틴 바리오스", year: 1921, category: "독주곡" }, // 번호 당김 (72 -> 71)
-            { id: 72, title: "알함브라 궁전의 추억", composer: "타레가", year: 1896, category: "독주곡" }, // 번호 당김 (73 -> 72)
-            { id: 73, title: "아스투리아스 (전설)", composer: "알베니스", year: 1892, category: "독주곡" }, // 번호 당김 (74 -> 73)
-            { id: 74, title: "스페인 무곡 5번 '안달루시아'", composer: "그라나도스", year: 1890, category: "독주곡" }, // 번호 당김 (75 -> 74)
-            { id: 75, title: "불새 조곡", composer: "스트라빈스키", year: 1910, category: "관현악곡" }, // 번호 당김 (76 -> 75)
-            { id: 76, title: "봄의 제전", composer: "스트라빈스키", year: 1913, category: "관현악곡" }, // 번호 당김 (77 -> 76)
-            { id: 77, title: "랩소디 인 블루", composer: "거슈윈", year: 1924, category: "협주곡" }, // 번호 당김 (78 -> 77)
-            { id: 78, title: "파리의 미국인", composer: "거슈윈", year: 1928, category: "관현악곡" }, // 번호 당김 (79 -> 78)
-            { id: 80, title: "정화된 밤", composer: "쇤베르크", year: 1899, category: "실내악" }, // 원래 리스트에서 79번도 비어있었음
-            { id: 81, title: "기악 명곡 81번", composer: "바흐", year: 1730, category: "독주곡" },
-            { id: 82, title: "고목 나무", composer: "쿠프랭", year: 1713, category: "독주곡" },
-            { id: 83, title: "클레멘타인 주제 변주곡", composer: "근대작곡가", year: 1930, category: "기타" },
-            { id: 84, title: "솔로 소나타 G단조", composer: "바흐", year: 1720, category: "독주곡" },
-            { id: 85, title: "기악곡 85번", composer: "텔레만", year: 1740, category: "실내악" },
-            { id: 86, title: "소나타 K.331 3악장", composer: "모차르트", year: 1783, category: "독주곡" },
-            { id: 87, title: "눈물 (Lagrima)", composer: "타레가", year: 1889, category: "독주곡" },
-            { id: 88, title: "아델리타 (Adelita)", composer: "타레가", year: 1889, category: "독주곡" },
-            { id: 89, title: "기악 소품 89번", composer: "소르", year: 1820, category: "독주곡" },
-            { id: 90, title: "기악 소품 90번", composer: "줄리아니", year: 1810, category: "독주곡" },
-            { id: 91, title: "비의 전주곡", composer: "쇼팽", year: 1839, category: "독주곡" },
-            { id: 92, title: "달빛 (베르가마스크 조곡 중)", composer: "드뷔시", year: 1890, category: "독주곡" },
-            { id: 93, title: "아라베스크 1번", composer: "드뷔시", year: 1888, category: "독주곡" },
-            { id: 94, title: "짐노페디 1번", composer: "에릭 사티", year: 1888, category: "독주곡" },
-            { id: 95, title: "주피터 테마곡", composer: "근대편곡", year: 1950, category: "기타" },
-            { id: 96, title: "라 쿠카라차", composer: "멕시코민요", year: 1910, category: "기타" },
-            { id: 97, title: "엘 콘도르 파사", composer: "페루민요", year: 1913, category: "기타" },
-            { id: 98, title: "그라나다", composer: "라라", year: 1932, category: "가곡" },
-            { id: 100, title: "고향의 봄", composer: "홍난파", year: 1926, category: "기타" },
-            { id: 101, title: "아리랑 환상곡", composer: "최성환", year: 1976, category: "관현악곡" },
-            { id: 102, title: "사계 중 '겨울'", composer: "비발디", year: 1725, category: "협주곡" },
-            { id: 103, title: "하프 협주곡 Bb장조", composer: "헨델", year: 1736, category: "협주곡" },
-            { id: 104, title: "수상음악 조곡", composer: "헨델", year: 1717, category: "관현악곡" },
-            { id: 105, title: "왕궁의 불꽃놀이", composer: "헨델", year: 1749, category: "관현악곡" }
+            { id: 69, title: "민요조곡 '까마귀'", composer: "전통민요", year: 1900, category: "기타" }, 
+            { id: 70, title: "그린슬리브스", composer: "영국민요", year: 1580, category: "기타" }, 
+            { id: 71, title: "대성당 (La Catedral)", composer: "아구스틴 바리오스", year: 1921, category: "독주곡" }, 
+            { id: 72, title: "알함브라 궁전의 추억", composer: "타레가", year: 1896, category: "독주곡" }, 
+            { id: 73, title: "아스투리아스 (전설)", composer: "알베니스", year: 1892, category: "독주곡" }, 
+            { id: 74, title: "스페인 무곡 5번 '안달루시아'", composer: "그라나도스", year: 1890, category: "독주곡" }, 
+            { id: 75, title: "불새 조곡", composer: "스트라빈스키", year: 1910, category: "관현악곡" }, 
+            { id: 76, title: "봄의 제전", composer: "스트라빈스키", year: 1913, category: "관현악곡" }, 
+            { id: 77, title: "랩소디 인 블루", composer: "거슈윈", year: 1924, category: "협주곡" }, 
+            { id: 78, title: "파리의 미국인", composer: "거슈윈", year: 1928, category: "관현악곡" }, 
+            { id: 79, title: "정화된 밤", composer: "쇤베르크", year: 1899, category: "실내악" }, // 79번 누락 에러 해결구간
+            { id: 80, title: "기악 명곡 81번", composer: "바흐", year: 1730, category: "독주곡" },
+            { id: 81, title: "고목 나무", composer: "쿠프랭", year: 1713, category: "독주곡" },
+            { id: 82, title: "클레멘타인 주제 변주곡", composer: "근대작곡가", year: 1930, category: "기타" },
+            { id: 83, title: "솔로 소나타 G단조", composer: "바흐", year: 1720, category: "독주곡" },
+            { id: 84, title: "기악곡 85번", composer: "텔레만", year: 1740, category: "실내악" },
+            { id: 85, title: "소나타 K.331 3악장", composer: "모차르트", year: 1783, category: "독주곡" },
+            { id: 86, title: "눈물 (Lagrima)", composer: "타레가", year: 1889, category: "독주곡" },
+            { id: 87, title: "아델리타 (Adelita)", composer: "타레가", year: 1889, category: "독주곡" },
+            { id: 88, title: "기악 소품 89번", composer: "소르", year: 1820, category: "독주곡" },
+            { id: 89, title: "기악 소품 90번", composer: "줄리아니", year: 1810, category: "독주곡" },
+            { id: 90, title: "비의 전주곡", composer: "쇼팽", year: 1839, category: "독주곡" },
+            { id: 91, title: "달빛 (베르가마스크 조곡 중)", composer: "드뷔시", year: 1890, category: "독주곡" },
+            { id: 92, title: "아라베스크 1번", composer: "드뷔시", year: 1888, category: "독주곡" },
+            { id: 93, title: "짐노페디 1번", composer: "에릭 사티", year: 1888, category: "독주곡" },
+            { id: 94, title: "주피터 테마곡", composer: "근대편곡", year: 1950, category: "기타" },
+            { id: 95, title: "라 쿠카라차", composer: "멕시코민요", year: 1910, category: "기타" },
+            { id: 96, title: "엘 콘도르 파사", composer: "페루민요", year: 1913, category: "기타" },
+            { id: 97, title: "그라나다", composer: "라라", year: 1932, category: "가곡" },
+            { id: 98, title: "고향의 봄", composer: "홍난파", year: 1926, category: "기타" },
+            { id: 99, title: "아리랑 환상곡", composer: "최성환", year: 1976, category: "관현악곡" },
+            { id: 100, title: "사계 중 '겨울'", composer: "비발디", year: 1725, category: "협주곡" },
+            { id: 101, title: "하프 협주곡 Bb장조", composer: "헨델", year: 1736, category: "협주곡" },
+            { id: 102, title: "수상음악 조곡", composer: "헨델", year: 1717, category: "관현악곡" },
+            { id: 103, title: "왕궁의 불꽃놀이", composer: "헨델", year: 1749, category: "관현악곡" }
         ];
 
         let tracks = [];
         let currentPassword = ""; 
         let activeSearchKeyword = ""; 
 
-        // 데이터 로드 및 초기 배치 제어
         onValue(dbRef, (snapshot) => {
             try {
                 const data = snapshot.val();
                 if (data && (Array.isArray(data) ? data.length > 50 : Object.keys(data).length > 50)) {
                     tracks = Array.isArray(data) ? data : Object.values(data);
                 } else {
-                    console.log("파이어베이스 공간이 비어있거나 데이터가 올바르지 않아 정렬된 104곡을 강제 동기화합니다.");
                     tracks = initialTracks;
                     set(dbRef, initialTracks); 
                 }
             } catch (e) {
-                console.error("데이터 로딩 중 에러 발생, 기본 데이터로 대체합니다:", e);
+                console.error("데이터 로딩 중 에러 발생:", e);
                 tracks = initialTracks;
             } finally {
                 initApp();
@@ -378,6 +376,7 @@
             });
         }
 
+        // 2. 카드 내부 레이아웃을 수정하여 작곡가 태그와 제목의 왼쪽 시작선을 완벽 일치시킴
         function render() {
             const grid = document.getElementById('libraryGrid');
             const selectedCategory = document.getElementById('categoryFilter').value || '전체 장르';
@@ -404,22 +403,21 @@
 
             filtered.forEach(track => {
                 const card = document.createElement('div');
-                card.className = "custom-card p-4.5 rounded-xl border border-stone-200/60 flex items-center justify-between gap-4 min-h-[68px] shadow-2xs cursor-pointer";
+                card.className = "custom-card p-4 rounded-xl border border-stone-200/60 flex items-center justify-between gap-3 min-h-[72px] shadow-2xs cursor-pointer";
                 card.onclick = () => openEditModal(track.id);
                 
                 card.innerHTML = `
-                    <div class="flex items-center gap-4 min-w-0 flex-1 pl-2">
-                        <span class="text-[11px] font-mono font-bold text-slate-400 flex-shrink-0 w-10">No.${String(track.id).padStart(2, '0')}</span>
-                        <div class="min-w-0 flex-1">
-                            <div class="text-sm mb-1 flex items-center gap-2">
-                                <span class="font-bold text-slate-800 bg-stone-100 px-2 py-0.5 rounded-sm">${track.composer}</span>
-                                <span class="text-stone-300">•</span>
-                                <span class="font-semibold text-slate-600">${track.year || 0}년 작품</span>
+                    <div class="flex items-start gap-3 min-w-0 flex-1 pl-1">
+                        <span class="text-[11px] font-mono font-bold text-slate-400 flex-shrink-0 w-10 pt-1">No. ${String(track.id).padStart(2, '0')}</span>
+                        <div class="min-w-0 flex-1 flex flex-col items-start gap-1">
+                            <div class="text-xs flex items-center gap-1.5 flex-wrap">
+                                <span class="font-bold text-slate-800 bg-stone-100 px-1.5 py-0.5 rounded-md border border-stone-200/40">${track.composer}</span>
+                                <span class="text-slate-500 font-medium text-[11px]">${track.year || 0}년 작품</span>
                             </div>
-                            <h3 class="font-bold text-slate-900 text-base leading-tight truncate tracking-tight" title="${track.title}">${track.title}</h3>
+                            <h3 class="font-bold text-slate-900 text-base leading-tight tracking-tight text-left truncate w-full" title="${track.title}">${track.title}</h3>
                         </div>
                     </div>
-                    <span class="text-xs font-medium text-indigo-700 bg-indigo-50/70 border border-indigo-100 px-3 py-1 rounded-full flex-shrink-0">${track.category || '기타'}</span>
+                    <span class="text-xs font-semibold text-indigo-700 bg-indigo-50/80 border border-indigo-100 px-2.5 py-1 rounded-full flex-shrink-0">${track.category || '기타'}</span>
                 `;
                 grid.appendChild(card);
             });
