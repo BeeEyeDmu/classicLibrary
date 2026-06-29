@@ -11,7 +11,7 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
             position: relative;
             overflow: hidden;
-            background-color: #ffffff !important; /* 기본 카드는 투명하고 깨끗한 화이트 */
+            background-color: #ffffff !important;
         }
         .custom-card::before {
             content: '';
@@ -32,14 +32,12 @@
             width: 4px;
         }
         
-        /* 짝수 카드를 아주 맑고 세련된 애쉬 베이지 그레이로 처리하여 촌스러움 제거 */
         .custom-card:nth-child(even) {
             background-color: #f8f9fa !important; 
         }
         .custom-card:nth-child(odd) {
             background-color: #ffffff !important; 
         }
-        
     </style>
 </head>
 <body class="bg-[#f1f3f5] text-slate-800 min-h-screen pb-16 text-sm antialiased">
@@ -111,13 +109,13 @@
         </section>
     </main>
 
-    <!-- 🎵 곡 추가/수정 공통 모달 팝업 -->
+    <!-- 🎵 곡 추가/수정/조회 공통 모달 팝업 -->
     <div id="trackModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 hidden z-50">
-        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 border border-stone-100">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 border border-stone-100 max-h-[90vh] overflow-y-auto">
             <h2 id="modalTitle" class="text-lg font-bold text-slate-900 mb-4 pb-2 border-b border-stone-100">곡 정보 수정 및 조회</h2>
             <input type="hidden" id="modalTrackId">
             
-            <div class="space-y-4 mb-6">
+            <div class="space-y-4 mb-5">
                 <div>
                     <label class="block text-sm font-bold text-slate-600 mb-1">작품명</label>
                     <input type="text" id="modalTitleInput" class="w-full px-3 py-2.5 border border-stone-200 rounded-lg focus:outline-none focus:border-slate-500 text-sm font-medium">
@@ -133,20 +131,42 @@
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-slate-600 mb-1">장르/분류</label>
-                        <input type="text" id="modalCategoryInput" class="w-full px-3 py-2.5 border border-stone-200 rounded-lg focus:outline-none focus:border-slate-500 text-sm font-medium">
+                        <select id="modalCategoryInput" class="w-full px-3 py-2.5 border border-stone-200 rounded-lg focus:outline-none focus:border-slate-500 text-sm font-medium bg-white text-slate-700">
+                            <option value="클래식 기타">클래식 기타</option>
+                            <option value="독주곡">독주곡</option>
+                            <option value="중주곡">중주곡</option>
+                            <option value="실내악">실내악</option>
+                            <option value="협주곡">협주곡</option>
+                            <option value="교향곡">교향곡</option>
+                            <option value="관현악곡">관현악곡</option>
+                            <option value="가곡/성악">가곡/성악</option>
+                            <option value="오페라/합창">오페라/합창</option>
+                            <option value="기타">기타</option>
+                        </select>
                     </div>
+                </div>
+                <!-- 📝 메모 기능 영역 추가 -->
+                <div>
+                    <label class="block text-sm font-bold text-slate-600 mb-1">노트 / 메모</label>
+                    <textarea id="modalMemoInput" rows="3" placeholder="곡에 대한 개인적인 감상이나 메모를 남겨보세요..." class="w-full px-3 py-2 border border-stone-200 rounded-lg focus:outline-none focus:border-slate-500 text-sm font-medium bg-stone-50 resize-none"></textarea>
                 </div>
             </div>
 
-            <div class="flex justify-between items-center gap-2">
-                <a id="btnYoutube" target="_blank" class="px-3 py-2.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-lg text-sm transition flex items-center gap-1.5">
+            <!-- 상단 작업 라인 (유튜브 & 삭제 버튼) -->
+            <div class="flex justify-between items-center gap-2 mb-4 pt-2 border-t border-stone-100">
+                <a id="btnYoutube" target="_blank" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-lg text-xs transition flex items-center gap-1.5">
                     <i class="fab fa-youtube text-red-600"></i> 유튜브 검색
                 </a>
-                
-                <div class="flex gap-2">
-                    <button id="btnCancelModal" class="px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-slate-600 font-bold rounded-lg text-sm transition">취소</button>
-                    <button id="btnSaveModal" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-950 text-white font-bold rounded-lg text-sm transition">저장하기</button>
-                </div>
+                <!-- 🗑️ 관리자 전용 삭제 버튼 -->
+                <button id="btnDeleteTrack" class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold rounded-lg text-xs transition flex items-center gap-1.5 hidden">
+                    <i class="fas fa-trash-alt"></i> 이 곡 삭제
+                </button>
+            </div>
+
+            <!-- 하단 제어 버튼 -->
+            <div class="flex justify-end gap-2 pt-2 border-t border-stone-100">
+                <button id="btnCancelModal" class="px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-slate-600 font-bold rounded-lg text-sm transition">취소</button>
+                <button id="btnSaveModal" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-950 text-white font-bold rounded-lg text-sm transition">저장하기</button>
             </div>
         </div>
     </div>
@@ -156,8 +176,9 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+        // ⚠️ [중요] 교수님의 기존 파이어베이스 config 키값들을 여기에 그대로 복사해 넣어주세요!
         const firebaseConfig = {
-            apiKey:"AIzaSyC0vb9iYY8Rgt6TJelolyl0QECCjTYZJ0g",
+            apiKey: "AIzaSyC0vb9iYY8Rgt6TJelolyl0QECCjTYZJ0g",
             authDomain: "classiclibrary-64b1e.firebaseapp.com",
             databaseURL: "https://classiclibrary-64b1e-default-rtdb.firebaseio.com",
             projectId: "classiclibrary-64b1e",
@@ -170,111 +191,112 @@
         const database = getDatabase(app);
         const dbRef = ref(database, "classic_library");
 
+        // 초기 데이터셋 (초기 실행/복구용)
         const initialTracks = [
             null, 
-            { id: 1, title: "첼로 소나타 1번 G단조", composer: "바흐", year: 1720, category: "독주곡" },
-            { id: 2, title: "카바티나 (Cavatina)", composer: "스탠리 마이어스", year: 1970, category: "독주곡" },
-            { id: 3, title: "첼로 모음곡 1번 - 프렐류드", composer: "바흐", year: 1720, category: "독주곡" },
-            { id: 4, title: "교향곡 5번 '운명'", composer: "베토벤", year: 1808, category: "교향곡" },
-            { id: 5, title: "피아노 협주곡 5번 '황제'", composer: "베토벤", year: 1811, category: "협주곡" },
-            { id: 6, title: "바이올린 협주곡 D장조", composer: "차이코프스키", year: 1878, category: "협주곡" },
-            { id: 7, title: "피아노 소나타 14번 '월광'", composer: "베토벤", year: 1801, category: "독주곡" },
-            { id: 8, title: "녹턴 Op.9 No.2", composer: "쇼팽", year: 1832, category: "독주곡" },
-            { id: 9, title: "G선상의 아리아", composer: "바흐", year: 1723, category: "관현악곡" },
-            { id: 10, title: "캐논 변주곡", composer: "파헬벨", year: 1680, category: "실내악" },
-            { id: 11, title: "사계 중 '봄'", composer: "비발디", year: 1725, category: "협주곡" },
-            { id: 12, title: "피아노 소나타 11번 '터키행진곡'", composer: "모차르트", year: 1783, category: "독주곡" },
-            { id: 13, title: "아이네 클라이네 나흐트무지크", composer: "모차르트", year: 1787, category: "실내악" },
-            { id: 14, title: "교향곡 9번 '신세계로부터'", composer: "드보르자크", year: 1893, category: "교향곡" },
-            { id: 15, title: "볼레로", composer: "라벨", year: 1928, category: "관현악곡" },
-            { id: 16, title: "카르멘 모음곡", composer: "비제", year: 1875, category: "관현악곡" },
-            { id: 17, title: "헝가리 무곡 5번", composer: "브람스", year: 1869, category: "관현악곡" },
-            { id: 18, title: "사랑의 기쁨", composer: "크라이슬러", year: 1905, category: "독주곡" },
-            { id: 19, title: "아베 마리아", composer: "슈베르트", year: 1825, category: "가곡" },
-            { id: 20, title: "동물의 사니발 중 '백조'", composer: "생상스", year: 1886, category: "실내악" },
-            { id: 21, title: "발레조곡 '호두까기 인형'", composer: "차이코프스키", year: 1892, category: "관현악곡" },
-            { id: 22, title: "클라리넷 협주곡 A장조", composer: "모차르트", year: 1791, category: "협주곡" },
-            { id: 23, title: "피아노 협주곡 21번 2악장", composer: "모차르트", year: 1785, category: "협주곡" },
-            { id: 24, title: "죽은 왕녀를 위한 파반느", composer: "라벨", year: 1899, category: "관현악곡" },
-            { id: 25, title: "치고이네르바이젠", composer: "사라사테", year: 1878, category: "관현악곡" },
-            { id: 26, title: "사랑의 인사", composer: "엘가", year: 1888, category: "독주곡" },
-            { id: 27, title: "위풍당당 행진곡 1번", composer: "엘가", year: 1901, category: "관현악곡" },
-            { id: 28, title: "아를의 여인 조곡 중 '미뉴에트'", composer: "비제", year: 1872, category: "관현악곡" },
-            { id: 29, title: "핀란디아", composer: "시벨리우스", year: 1899, category: "관현악곡" },
-            { id: 30, title: "전람회의 그림", composer: "무소륵스키", year: 1874, category: "관현악곡" },
-            { id: 31, title: "페르귄트 조곡 중 '아침의 기분'", composer: "그리그", year: 1875, category: "관현악곡" },
-            { id: 32, title: "솔베이지의 노래", composer: "그리그", year: 1875, category: "관현악곡" },
-            { id: 33, title: "명상곡 (타이스)", composer: "마스네", year: 1894, category: "독주곡" },
-            { id: 34, title: "라 캄파넬라", composer: "리스트", year: 1851, category: "독주곡" },
-            { id: 35, title: "사랑의 꿈 3번", composer: "리스트", year: 1850, category: "독주곡" },
-            { id: 36, title: "환상 즉흥곡", composer: "쇼팽", year: 1835, category: "독주곡" },
-            { id: 37, title: "강아지 왈츠", composer: "쇼팽", year: 1847, category: "독주곡" },
-            { id: 38, title: "이별의 곡", composer: "쇼팽", year: 1832, category: "독주곡" },
-            { id: 39, title: "영웅 폴로네즈", composer: "쇼팽", year: 1842, category: "독주곡" },
-            { id: 40, title: "트라우메라이 (꿈)", composer: "슈만", year: 1838, category: "독주곡" },
-            { id: 41, title: "피아노 협주곡 A단조", composer: "그리그", year: 1868, category: "협주곡" },
-            { id: 42, title: "피아노 협주곡 2번", composer: "라흐마니노프", year: 1901, category: "협주곡" },
-            { id: 43, title: "파가니니 주제에 의한 랩소디", composer: "라흐마니노프", year: 1934, category: "협주곡" },
-            { id: 44, title: "파가니니 카프리스 24번", composer: "파가니니", year: 1817, category: "독주곡" },
-            { id: 45, title: "바이올린 소나타 '악마의 트릴'", composer: "타르티니", year: 1799, category: "독주곡" },
-            { id: 46, title: "자라투스트라는 이렇게 말했다", composer: "리하르트 슈트라우스", year: 1896, category: "관현악곡" },
-            { id: 47, title: "아름답고 푸른 도나우", composer: "요한 슈트라우스 2세", year: 1867, category: "관현악곡" },
-            { id: 48, title: "라데츠키 행진곡", composer: "요한 슈트라우스 1세", year: 1848, category: "관현악곡" },
-            { id: 49, title: "경기병 서곡", composer: "주페", year: 1866, category: "관현악곡" },
-            { id: 50, title: "천국과 지옥 서곡", composer: "오펜바흐", year: 1858, category: "관현악곡" },
-            { id: 51, title: "한여름 밤의 꿈 중 '축혼행진곡'", composer: "멘델스존", year: 1842, category: "관현악곡" },
-            { id: 52, title: "바이올린 협주곡 E단조", composer: "멘델스존", year: 1844, category: "협주곡" },
-            { id: 53, title: "교향곡 9번 '합창'", composer: "베토벤", year: 1824, category: "교향곡" },
-            { id: 54, title: "교향곡 6번 '전원'", composer: "베토벤", year: 1808, category: "교향곡" },
-            { id: 55, title: "교향곡 40번 G단조", composer: "모차르트", year: 1788, category: "교향곡" },
-            { id: 56, title: "교향곡 94번 '놀람'", composer: "하이든", year: 1791, category: "교향곡" },
-            { id: 57, title: "교향곡 101번 '시계'", composer: "하이든", year: 1793, category: "교향곡" },
-            { id: 58, title: "교향곡 8번 '미완성'", composer: "슈베르트", year: 1822, category: "교향곡" },
-            { id: 59, title: "교향곡 6번 '비창'", composer: "차이코프스키", year: 1893, category: "교향곡" },
-            { id: 60, title: "발레조곡 '백조의 호수'", composer: "차이코프스키", year: 1876, category: "관현악곡" },
-            { id: 61, title: "발레조곡 '잠자는 숲속의 미녀'", composer: "차이코프스키", year: 1889, category: "관현악곡" },
-            { id: 62, title: "1812년 서곡", composer: "차이코프스키", year: 1880, category: "관현악곡" },
-            { id: 63, title: "넵튠 (행성 조곡 중)", composer: "홀스트", year: 1916, category: "관현악곡" },
-            { id: 64, title: "주피터 (행성 조곡 중)", composer: "홀스트", year: 1916, category: "관현악곡" },
-            { id: 65, title: "푸른 옷소매 환상곡", composer: "본 윌리엄스", year: 1934, category: "관현악곡" },
-            { id: 66, title: "탈리스 주제에 의한 환상곡", composer: "본 윌리엄스", year: 1910, category: "관현악곡" },
-            { id: 67, title: "셰헤라자데", composer: "림스키코르사코프", year: 1888, category: "관현악곡" },
-            { id: 68, title: "왕벌의 비행", composer: "림스키코르사코프", year: 1900, category: "독주곡" },
-            { id: 70, title: "민요조곡 '까마귀'", composer: "전통민요", year: 1900, category: "기타" }, 
-            { id: 71, title: "그린슬리브스", composer: "영국민요", year: 1580, category: "기타" }, 
-            { id: 72, title: "대성당 (La Catedral)", composer: "아구스틴 바리오스", year: 1921, category: "독주곡" }, 
-            { id: 73, title: "알함브라 궁전의 추억", composer: "타레가", year: 1896, category: "독주곡" }, 
-            { id: 74, title: "아스투리아스 (전설)", composer: "알베니스", year: 1892, category: "독주곡" }, 
-            { id: 75, title: "스페인 무곡 5번 '안달루시아'", composer: "그라나도스", year: 1890, category: "독주곡" }, 
-            { id: 76, title: "불새 조곡", composer: "스트라빈스키", year: 1910, category: "관현악곡" }, 
-            { id: 77, title: "봄의 제전", composer: "스트라빈스키", year: 1913, category: "관현악곡" }, 
-            { id: 78, title: "랩소디 인 블루", composer: "거슈윈", year: 1924, category: "협주곡" }, 
-            { id: 79, title: "파리의 미국인", composer: "거슈윈", year: 1928, category: "관현악곡" }, 
-            { id: 80, title: "정화된 밤", composer: "쇤베르크", year: 1899, category: "실내악" }, 
-            { id: 81, title: "기악 명곡 81번", composer: "바흐", year: 1730, category: "독주곡" },
-            { id: 82, title: "고목 나무", composer: "쿠프랭", year: 1713, category: "독주곡" },
-            { id: 83, title: "클레멘타인 주제 변주곡", composer: "근대작곡가", year: 1930, category: "기타" },
-            { id: 84, title: "솔로 소나타 G단조", composer: "바흐", year: 1720, category: "독주곡" },
-            { id: 85, title: "기악곡 85번", composer: "텔레만", year: 1740, category: "실내악" },
-            { id: 86, title: "소나타 K.331 3악장", composer: "모차르트", year: 1783, category: "독주곡" },
-            { id: 87, title: "눈물 (Lagrima)", composer: "타레가", year: 1889, category: "독주곡" },
-            { id: 88, title: "아델리타 (Adelita)", composer: "타레가", year: 1889, category: "독주곡" },
-            { id: 89, title: "기악 소품 89번", composer: "소르", year: 1820, category: "독주곡" },
-            { id: 90, title: "기악 소품 90번", composer: "줄리아니", year: 1810, category: "독주곡" },
-            { id: 91, title: "비의 전주곡", composer: "쇼팽", year: 1839, category: "독주곡" },
-            { id: 92, title: "달빛 (베르가마스크 조곡 중)", composer: "드뷔시", year: 1890, category: "독주곡" },
-            { id: 93, title: "아라베스크 1번", composer: "드뷔시", year: 1888, category: "독주곡" },
-            { id: 94, title: "짐노페디 1번", composer: "에릭 사티", year: 1888, category: "독주곡" },
-            { id: 95, title: "주피터 테마곡", composer: "근대편곡", year: 1950, category: "기타" },
-            { id: 96, title: "라 쿠카라차", composer: "멕시코민요", year: 1910, category: "기타" },
-            { id: 97, title: "엘 콘도르 파사", composer: "페루민요", year: 1913, category: "기타" },
-            { id: 98, title: "그라나다", composer: "라라", year: 1932, category: "가곡" },
-            { id: 99, title: "고향의 봄", composer: "홍난파", year: 1926, category: "기타" },
-            { id: 100, title: "아리랑 환상곡", composer: "최성환", year: 1976, category: "관현악곡" },
-            { id: 101, title: "사계 중 '겨울'", composer: "비발디", year: 1725, category: "협주곡" },
-            { id: 102, title: "하프 협주곡 Bb장조", composer: "헨델", year: 1736, category: "협주곡" },
-            { id: 103, title: "수상음악 조곡", composer: "헨델", year: 1717, category: "관현악곡" },
-            { id: 104, title: "왕궁의 불꽃놀이", composer: "헨델", year: 1749, category: "관현악곡" }
+            { id: 1, title: "첼로 소나타 1번 G단조", composer: "바흐", year: 1720, category: "독주곡", memo: "" },
+            { id: 2, title: "카바티나 (Cavatina)", composer: "스탠리 마이어스", year: 1970, category: "클래식 기타", memo: "" },
+            { id: 3, title: "첼로 모음곡 1번 - 프렐류드", composer: "바흐", year: 1720, category: "독주곡", memo: "" },
+            { id: 4, title: "교향곡 5번 '운명'", composer: "베토벤", year: 1808, category: "교향곡", memo: "" },
+            { id: 5, title: "피아노 협주곡 5번 '황제'", composer: "베토벤", year: 1811, category: "협주곡", memo: "" },
+            { id: 6, title: "바이올린 협주곡 D장조", composer: "차이코프스키", year: 1878, category: "협주곡", memo: "" },
+            { id: 7, title: "피아노 소나타 14번 '월광'", composer: "베토벤", year: 1801, category: "독주곡", memo: "" },
+            { id: 8, title: "녹턴 Op.9 No.2", composer: "쇼팽", year: 1832, category: "독주곡", memo: "" },
+            { id: 9, title: "G선상의 아리아", composer: "바흐", year: 1723, category: "관현악곡", memo: "" },
+            { id: 10, title: "캐논 변주곡", composer: "파헬벨", year: 1680, category: "실내악", memo: "" },
+            { id: 11, title: "사계 중 '봄'", composer: "비발디", year: 1725, category: "협주곡", memo: "" },
+            { id: 12, title: "피아노 소나타 11번 '터키행진곡'", composer: "모차르트", year: 1783, category: "독주곡", memo: "" },
+            { id: 13, title: "아이네 클라이네 나흐트무지크", composer: "모차르트", year: 1787, category: "실내악", memo: "" },
+            { id: 14, title: "교향곡 9번 '신세계로부터'", composer: "드보르자크", year: 1893, category: "교향곡", memo: "" },
+            { id: 15, title: "볼레로", composer: "라벨", year: 1928, category: "관현악곡", memo: "" },
+            { id: 16, title: "카르멘 모음곡", composer: "비제", year: 1875, category: "관현악곡", memo: "" },
+            { id: 17, title: "헝가리 무곡 5번", composer: "브람스", year: 1869, category: "관현악곡", memo: "" },
+            { id: 18, title: "사랑의 기쁨", composer: "크라이슬러", year: 1905, category: "독주곡", memo: "" },
+            { id: 19, title: "아베 마리아", composer: "슈베르트", year: 1825, category: "가곡/성악", memo: "" },
+            { id: 20, title: "동물의 사니발 중 '백조'", composer: "생상스", year: 1886, category: "실내악", memo: "" },
+            { id: 21, title: "발레조곡 '호두까기 인형'", composer: "차이코프스키", year: 1892, category: "관현악곡", memo: "" },
+            { id: 22, title: "클라리넷 협주곡 A장조", composer: "모차르트", year: 1791, category: "협주곡", memo: "" },
+            { id: 23, title: "피아노 협주곡 21번 2악장", composer: "모차르트", year: 1785, category: "협주곡", memo: "" },
+            { id: 24, title: "죽은 왕녀를 위한 파반느", composer: "라벨", year: 1899, category: "관현악곡", memo: "" },
+            { id: 25, title: "치고이네르바이젠", composer: "사라사테", year: 1878, category: "관현악곡", memo: "" },
+            { id: 26, title: "사랑의 인사", composer: "엘가", year: 1888, category: "독주곡", memo: "" },
+            { id: 27, title: "위풍당당 행진곡 1번", composer: "엘가", year: 1901, category: "관현악곡", memo: "" },
+            { id: 28, title: "아를의 여인 조곡 중 '미뉴에트'", composer: "비제", year: 1872, category: "관현악곡", memo: "" },
+            { id: 29, title: "핀란디아", composer: "시벨리우스", year: 1899, category: "관현악곡", memo: "" },
+            { id: 30, title: "전람회의 그림", composer: "무소륵스키", year: 1874, category: "관현악곡", memo: "" },
+            { id: 31, title: "페르귄트 조곡 중 '아침의 기분'", composer: "그리그", year: 1875, category: "관현악곡", memo: "" },
+            { id: 32, title: "솔베이지의 노래", composer: "그리그", year: 1875, category: "관현악곡", memo: "" },
+            { id: 33, title: "명상곡 (타이스)", composer: "마스네", year: 1894, category: "독주곡", memo: "" },
+            { id: 34, title: "라 캄파넬라", composer: "리스트", year: 1851, category: "독주곡", memo: "" },
+            { id: 35, title: "사랑의 꿈 3번", composer: "리스트", year: 1850, category: "독주곡", memo: "" },
+            { id: 36, title: "환상 즉흥곡", composer: "쇼팽", year: 1835, category: "독주곡", memo: "" },
+            { id: 37, title: "강아지 왈츠", composer: "쇼팽", year: 1847, category: "독주곡", memo: "" },
+            { id: 38, title: "이별의 곡", composer: "쇼팽", year: 1832, category: "독주곡", memo: "" },
+            { id: 39, title: "영웅 폴로네즈", composer: "쇼팽", year: 1842, category: "독주곡", memo: "" },
+            { id: 40, title: "트라우메라이 (꿈)", composer: "슈만", year: 1838, category: "독주곡", memo: "" },
+            { id: 41, title: "피아노 협주곡 A단조", composer: "그리그", year: 1868, category: "협주곡", memo: "" },
+            { id: 42, title: "피아노 협주곡 2번", composer: "라흐마니노프", year: 1901, category: "협주곡", memo: "" },
+            { id: 43, title: "파가니니 주제에 의한 랩소디", composer: "라흐마니노프", year: 1934, category: "협주곡", memo: "" },
+            { id: 44, title: "파가니니 카프리스 24번", composer: "파가니니", year: 1817, category: "독주곡", memo: "" },
+            { id: 45, title: "바이올린 소나타 '악마의 트릴'", composer: "타르티니", year: 1799, category: "독주곡", memo: "" },
+            { id: 46, title: "자라투스트라는 이렇게 말했다", composer: "리하르트 슈트라우스", year: 1896, category: "관현악곡", memo: "" },
+            { id: 47, title: "아름답고 푸른 도나우", composer: "요한 슈트라우스 2세", year: 1867, category: "관현악곡", memo: "" },
+            { id: 48, title: "라데츠키 행진곡", composer: "요한 슈트라우스 1세", year: 1848, category: "관현악곡", memo: "" },
+            { id: 49, title: "경기병 서곡", composer: "주페", year: 1866, category: "관현악곡", memo: "" },
+            { id: 50, title: "천국과 지옥 서곡", composer: "오펜바흐", year: 1858, category: "관현악곡", memo: "" },
+            { id: 51, title: "한여름 밤의 꿈 중 '축혼행진곡'", composer: "멘델스존", year: 1842, category: "관현악곡", memo: "" },
+            { id: 52, title: "바이올린 협주곡 E단조", composer: "멘델스존", year: 1844, category: "협주곡", memo: "" },
+            { id: 53, title: "교향곡 9번 '합창'", composer: "베토벤", year: 1824, category: "교향곡", memo: "" },
+            { id: 54, title: "교향곡 6번 '전원'", composer: "베토벤", year: 1808, category: "교향곡", memo: "" },
+            { id: 55, title: "교향곡 40번 G단조", composer: "모차르트", year: 1788, category: "교향곡", memo: "" },
+            { id: 56, title: "교향곡 94번 '놀람'", composer: "하이든", year: 1791, category: "교향곡", memo: "" },
+            { id: 57, title: "교향곡 101번 '시계'", composer: "하이든", year: 1793, category: "교향곡", memo: "" },
+            { id: 58, title: "교향곡 8번 '미완성'", composer: "슈베르트", year: 1822, category: "교향곡", memo: "" },
+            { id: 59, title: "교향곡 6번 '비창'", composer: "차이코프스키", year: 1893, category: "교향곡", memo: "" },
+            { id: 60, title: "발레조곡 '백조의 호수'", composer: "차이코프스키", year: 1876, category: "관현악곡", memo: "" },
+            { id: 61, title: "발레조곡 '잠자는 숲속의 미녀'", composer: "차이코프스키", year: 1889, category: "관현악곡", memo: "" },
+            { id: 62, title: "1812년 서곡", composer: "차이코프스키", year: 1880, category: "관현악곡", memo: "" },
+            { id: 63, title: "넵튠 (행성 조곡 중)", composer: "홀스트", year: 1916, category: "관현악곡", memo: "" },
+            { id: 64, title: "주피터 (행성 조곡 중)", composer: "홀스트", year: 1916, category: "관현악곡", memo: "" },
+            { id: 65, title: "푸른 옷소매 환상곡", composer: "본 윌리엄스", year: 1934, category: "관현악곡", memo: "" },
+            { id: 66, title: "탈리스 주제에 의한 환상곡", composer: "본 윌리엄스", year: 1910, category: "관현악곡", memo: "" },
+            { id: 67, title: "셰헤라자데", composer: "림스키코르사코프", year: 1888, category: "관현악곡", memo: "" },
+            { id: 68, title: "왕벌의 비행", composer: "림스키코르사코프", year: 1900, category: "독주곡", memo: "" },
+            { id: 70, title: "민요조곡 '까마귀'", composer: "전통민요", year: 1900, category: "기타", memo: "" }, 
+            { id: 71, title: "그린슬리브스", composer: "영국민요", year: 1580, category: "기타", memo: "" }, 
+            { id: 72, title: "대성당 (La Catedral)", composer: "아구스틴 바리오스", year: 1921, category: "클래식 기타", memo: "" }, 
+            { id: 73, title: "알함브라 궁전의 추억", composer: "타레가", year: 1896, category: "클래식 기타", memo: "" }, 
+            { id: 74, title: "아스투리아스 (전설)", composer: "알베니스", year: 1892, category: "독주곡", memo: "" }, 
+            { id: 75, title: "스페인 무곡 5번 '안달루시아'", composer: "그라나도스", year: 1890, category: "독주곡", memo: "" }, 
+            { id: 76, title: "불새 조곡", composer: "스트라빈스키", year: 1910, category: "관현악곡", memo: "" }, 
+            { id: 77, title: "봄의 제전", composer: "스트라빈스키", year: 1913, category: "관현악곡", memo: "" }, 
+            { id: 78, title: "랩소디 인 블루", composer: "거슈윈", year: 1924, category: "협주곡", memo: "" }, 
+            { id: 79, title: "파리의 미국인", composer: "거슈윈", year: 1928, category: "관현악곡", memo: "" }, 
+            { id: 80, title: "정화된 밤", composer: "쇤베르크", year: 1899, category: "실내악", memo: "" }, 
+            { id: 81, title: "기악 명곡 81번", composer: "바흐", year: 1730, category: "독주곡", memo: "" },
+            { id: 82, title: "고목 나무", composer: "쿠프랭", year: 1713, category: "독주곡", memo: "" },
+            { id: 83, title: "클레멘타인 주제 변주곡", composer: "근대작곡가", year: 1930, category: "기타", memo: "" },
+            { id: 84, title: "솔로 소나타 G단조", composer: "바흐", year: 1720, category: "독주곡", memo: "" },
+            { id: 85, title: "기악곡 85번", composer: "텔레만", year: 1740, category: "실내악", memo: "" },
+            { id: 86, title: "소나타 K.331 3악장", composer: "모차르트", year: 1783, category: "독주곡", memo: "" },
+            { id: 87, title: "눈물 (Lagrima)", composer: "타레가", year: 1889, category: "클래식 기타", memo: "" },
+            { id: 88, title: "아델리타 (Adelita)", composer: "타레가", year: 1889, category: "클래식 기타", memo: "" },
+            { id: 89, title: "기악 소품 89번", composer: "소르", year: 1820, category: "독주곡", memo: "" },
+            { id: 90, title: "기악 소품 90번", composer: "줄리아니", year: 1810, category: "독주곡", memo: "" },
+            { id: 91, title: "비의 전주곡", composer: "쇼팽", year: 1839, category: "독주곡", memo: "" },
+            { id: 92, title: "달빛 (베르가마스크 조곡 중)", composer: "드뷔시", year: 1890, category: "독주곡", memo: "" },
+            { id: 93, title: "아라베스크 1번", composer: "드뷔시", year: 1888, category: "독주곡", memo: "" },
+            { id: 94, title: "짐노페디 1번", composer: "에릭 사티", year: 1888, category: "독주곡", memo: "" },
+            { id: 95, title: "주피터 테마곡", composer: "근대편곡", year: 1950, category: "기타", memo: "" },
+            { id: 96, title: "라 쿠카라차", composer: "멕시코민요", year: 1910, category: "기타", memo: "" },
+            { id: 97, title: "엘 콘도르 파사", composer: "페루민요", year: 1913, category: "기타", memo: "" },
+            { id: 98, title: "그라나다", composer: "라라", year: 1932, category: "가곡/성악", memo: "" },
+            { id: 99, title: "고향의 봄", composer: "홍난파", year: 1926, category: "기타", memo: "" },
+            { id: 100, title: "아리랑 환상곡", composer: "최성환", year: 1976, category: "관현악곡", memo: "" },
+            { id: 101, title: "사계 중 '겨울'", composer: "비발디", year: 1725, category: "협주곡", memo: "" },
+            { id: 102, title: "하프 협주곡 Bb장조", composer: "헨델", year: 1736, category: "협주곡", memo: "" },
+            { id: 103, title: "수상음악 조곡", composer: "헨델", year: 1717, category: "관현악곡", memo: "" },
+            { id: 104, title: "왕궁의 불꽃놀이", composer: "헨델", year: 1749, category: "관현악곡", memo: "" }
         ];
 
         let tracks = [];
@@ -311,17 +333,20 @@
             const addBtn = document.getElementById('btnAddTrack');
             const saveModalBtn = document.getElementById('btnSaveModal');
             const authBtn = document.getElementById('btnAdminAuth');
+            const deleteTrackBtn = document.getElementById('btnDeleteTrack');
 
             if (currentPassword) {
                 backupZone.classList.remove('hidden');
                 addBtn.classList.remove('hidden');
                 saveModalBtn.classList.remove('hidden');
+                deleteTrackBtn.classList.remove('hidden');
                 authBtn.innerHTML = `<i class="fas fa-unlock text-emerald-400 mr-1"></i> 인증 완료`;
                 authBtn.className = "mt-1 px-3 py-1 bg-emerald-950 text-emerald-300 text-xs rounded-md border border-emerald-800 transition";
             } else {
                 backupZone.classList.add('hidden');
                 addBtn.classList.add('hidden');
                 saveModalBtn.classList.add('hidden');
+                deleteTrackBtn.classList.add('hidden');
                 authBtn.innerHTML = `<i class="fas fa-lock mr-1"></i> 관리자 인증`;
                 authBtn.className = "mt-1 px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-md border border-slate-700 transition";
             }
@@ -394,6 +419,7 @@
             const sortOrder = document.getElementById('sortOrder').value;
 
             grid.innerHTML = '';
+            // 필터링 및 렌더링 시 null 값 제거 처리 강화
             let filtered = tracks.filter(t => t !== null && t !== undefined && t.id);
 
             if (selectedCategory !== '전체 장르') {
@@ -414,22 +440,18 @@
 
             filtered.forEach(track => {
                 const card = document.createElement('div');
-                // 최소 높이를 확보하여 레이아웃 안정화
                 card.className = "custom-card p-4 rounded-xl border border-stone-300/70 flex items-center justify-between gap-3 min-h-[84px] shadow-xs cursor-pointer";
                 card.onclick = () => openEditModal(track.id);
                 
                 card.innerHTML = `
                     <div class="flex items-start gap-1 min-w-0 flex-1">
-                        <!-- 번호 영역 폰트 크기 1단계 확대 (text-[11px] -> text-xs font-bold) 및 너비 고정(w-14) -->
                         <span class="text-xs font-mono font-bold text-slate-400 flex-shrink-0 w-14 pt-1.5">No.${String(track.id).padStart(2, '0')}</span>
                         <div class="min-w-0 flex-1 flex flex-col items-start gap-1 pl-1">
-                            <!-- 상단: 테두리를 지우고 순수 텍스트 상태로 정렬 라인 통일, 폰트 1단계 확대 (text-xs -> text-sm) -->
                             <div class="text-sm flex items-center gap-2 flex-wrap">
                                 <span class="font-extrabold text-slate-900">${track.composer}</span>
                                 <span class="text-slate-400 font-light text-xs">|</span>
                                 <span class="text-slate-500 font-medium">${track.year || 0}년 작품</span>
                             </div>
-                            <!-- 하단: 곡 제목 왼쪽 라인 깔끔하게 수직 일치 (텍스트 크기를 한 단계 키운 text-lg 배치) -->
                             <h3 class="font-bold text-slate-900 text-lg leading-snug tracking-tight text-left truncate w-full" title="${track.title}">${track.title}</h3>
                         </div>
                     </div>
@@ -468,15 +490,18 @@
             document.getElementById('modalTitleInput').value = track.title || '';
             document.getElementById('modalComposerInput').value = track.composer || '';
             document.getElementById('modalYearInput').value = track.year || '';
-            document.getElementById('modalCategoryInput').value = track.category || '';
+            document.getElementById('modalCategoryInput').value = track.category || '독주곡';
+            document.getElementById('modalMemoInput').value = track.memo || ''; // 메모 연동
             
             const query = encodeURIComponent(`${track.composer} ${track.title}`);
             document.getElementById('btnYoutube').href = `https://www.youtube.com/results?search_query=${query}`;
             document.getElementById('btnYoutube').classList.remove('hidden');
 
-            const inputs = ['modalTitleInput', 'modalComposerInput', 'modalYearInput', 'modalCategoryInput'];
+            // 관리자 인증 여부에 따라 입력 폼 및 메모장 활성화 제어
+            const inputs = ['modalTitleInput', 'modalComposerInput', 'modalYearInput', 'modalCategoryInput', 'modalMemoInput'];
             inputs.forEach(id => document.getElementById(id).disabled = !currentPassword);
 
+            checkAdminStatus();
             document.getElementById('trackModal').classList.remove('hidden');
         }
 
@@ -491,12 +516,14 @@
             document.getElementById('modalTitleInput').value = "";
             document.getElementById('modalComposerInput').value = "";
             document.getElementById('modalYearInput').value = new Date().getFullYear();
-            document.getElementById('modalCategoryInput').value = "협주곡";
+            document.getElementById('modalCategoryInput').value = "클래식 기타"; 
+            document.getElementById('modalMemoInput').value = "";
             
-            const inputs = ['modalTitleInput', 'modalComposerInput', 'modalYearInput', 'modalCategoryInput'];
+            const inputs = ['modalTitleInput', 'modalComposerInput', 'modalYearInput', 'modalCategoryInput', 'modalMemoInput'];
             inputs.forEach(id => document.getElementById(id).disabled = false);
 
             document.getElementById('btnYoutube').classList.add('hidden');
+            document.getElementById('btnDeleteTrack').classList.add('hidden'); // 추가 모달에서는 삭제버튼 숨김
             document.getElementById('trackModal').classList.remove('hidden');
         });
 
@@ -507,19 +534,38 @@
             const title = document.getElementById('modalTitleInput').value.trim();
             const composer = document.getElementById('modalComposerInput').value.trim();
             const year = parseInt(document.getElementById('modalYearInput').value) || 0;
-            const category = document.getElementById('modalCategoryInput').value.trim();
+            const category = document.getElementById('modalCategoryInput').value;
+            const memo = document.getElementById('modalMemoInput').value.trim(); // 메모 값 추출
 
             if (!title || !composer) {
                 alert("작품명과 작곡가는 필수 입력 사항입니다.");
                 return;
             }
 
-            const newTrack = { id, title, composer, year, category };
+            const newTrack = { id, title, composer, year, category, memo };
             tracks[id] = newTrack;
 
             set(dbRef, tracks).then(() => {
                 document.getElementById('trackModal').classList.add('hidden');
             }).catch(err => alert("저장 실패: " + err.message));
+        });
+
+        // 🗑️ 관리자 전용 삭제 핸들러 기능 정의
+        document.getElementById('btnDeleteTrack').addEventListener('click', () => {
+            if (!currentPassword) return;
+            
+            const id = parseInt(document.getElementById('modalTrackId').value);
+            const title = document.getElementById('modalTitleInput').value;
+
+            if (confirm(`[주의] "${title}" 곡을 정말로 삭제하시겠습니까?\n삭제된 곡은 복구할 수 없습니다.`)) {
+                // 배열 내에서 완전히 지우지 않고 null로 마킹하여 기존 ID 순서 체계 유지 보존
+                tracks[id] = null; 
+
+                set(dbRef, tracks).then(() => {
+                    alert("성공적으로 삭제되었습니다.");
+                    document.getElementById('trackModal').classList.add('hidden');
+                }).catch(err => alert("삭제 실패: " + err.message));
+            }
         });
 
         document.getElementById('btnCancelModal').addEventListener('click', () => {
