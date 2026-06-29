@@ -308,24 +308,28 @@
         // 🔒 데이터베이스 쓰기 규칙 위배를 방지하기 위한 보안 전송 함수
         function safeSaveToFirebase(dataArray) {
             const payload = JSON.parse(JSON.stringify(dataArray));
+            // 규칙 검증용 해시값 생성
+            const passwordHash = CryptoJS.SHA256(currentPassword).toString();
+            
             if (Array.isArray(payload)) {
                 payload.forEach(item => {
-                    if (item) item.admin_password = currentPassword;
+                    if (item) item.admin_password = passwordHash;
                 });
             } else if (typeof payload === 'object') {
-                payload.admin_password = currentPassword;
+                payload.admin_password = passwordHash;
             }
             return set(dbRef, payload);
         }
 
         // 🗄️ 백업 기능 스크립트
-        document.getElementById('btnBackup').addEventListener('click', () => {
+       document.getElementById('btnBackup').addEventListener('click', () => {
             if (!currentPassword) return;
             if (confirm("현재 리스트를 파이어베이스 백업 공간에 저장하시겠습니까?")) {
-                const backupRef = ref(database, `classic_library_backup_${currentPassword}`);
+                const passwordHash = CryptoJS.SHA256(currentPassword).toString();
+                const backupRef = ref(database, `classic_library_backup_${passwordHash}`);
                 const payload = JSON.parse(JSON.stringify(tracks));
                 if(Array.isArray(payload)) {
-                    payload.forEach(item => { if(item) item.admin_password = currentPassword; });
+                    payload.forEach(item => { if(item) item.admin_password = passwordHash; });
                 }
                 set(backupRef, payload)
                     .then(() => alert("성공적으로 백업되었습니다."))
